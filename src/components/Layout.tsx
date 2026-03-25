@@ -1,7 +1,7 @@
 import React from 'react';
 import { 
   Home, BookOpen, BrainCircuit, MessageSquare, 
-  Settings, LogOut, Bell, Search, Users, BarChart3, Plus
+  Settings, LogOut, Bell, Users, BarChart3, Plus
 } from 'lucide-react';
 import { User } from '../types';
 
@@ -111,14 +111,6 @@ export default function Layout({ children, user, currentView, onNavigate, onLogo
           </div>
 
           <div className="flex items-center gap-3 md:gap-6">
-            <div className="hidden md:flex relative items-center bg-surface-container-low rounded-full px-4 py-2 w-64 border border-outline-variant/20 focus-within:border-primary/50 transition-colors">
-              <Search size={16} className="text-slate-400" />
-              <input 
-                type="text" 
-                placeholder="検索..." 
-                className="bg-transparent border-none focus:ring-0 text-sm w-full placeholder:text-slate-400 ml-2 outline-none"
-              />
-            </div>
             <button className="p-2 text-on-surface hover:opacity-70 transition-opacity relative">
               <Bell size={18} strokeWidth={1.5} />
               <span className="absolute top-1.5 right-1.5 w-2 h-2 bg-error rounded-full border-2 border-background"></span>

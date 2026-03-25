@@ -1,14 +1,9 @@
-import React, { useState } from 'react';
-import { Search, Filter, Plus, Edit, Trash2, Eye, ChevronLeft, ChevronRight, BarChart2 } from 'lucide-react';
+import React from 'react';
+import { Filter, Plus, Edit, Trash2, Eye, ChevronLeft, ChevronRight, BarChart2 } from 'lucide-react';
 import { mockCourses } from '../../mockData';
 
 export default function CourseList({ onNavigate }: { onNavigate: (view: string) => void }) {
-  const [searchTerm, setSearchTerm] = useState('');
-
-  const filteredCourses = mockCourses.filter(course => 
-    course.title.toLowerCase().includes(searchTerm.toLowerCase()) || 
-    course.category.toLowerCase().includes(searchTerm.toLowerCase())
-  );
+  const filteredCourses = mockCourses;
 
   return (
     <div className="animate-in fade-in duration-500 pb-24 overflow-x-hidden">
@@ -25,17 +20,7 @@ export default function CourseList({ onNavigate }: { onNavigate: (view: string) 
             </p>
           </div>
 
-          <div className="flex items-center gap-2 md:gap-3 w-full md:w-auto mt-2 md:mt-0">
-            <div className="relative flex items-center bg-surface-low rounded-full px-4 md:px-5 py-2.5 md:py-3 flex-1 md:w-72 border border-outline-variant/30 focus-within:border-on-surface transition-colors">
-              <Search size={18} className="text-secondary" />
-              <input 
-                type="text" 
-                placeholder="コース名やカテゴリで検索..." 
-                value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
-                className="bg-transparent border-none focus:ring-0 text-sm w-full placeholder:text-secondary/50 ml-2 md:ml-3 outline-none"
-              />
-            </div>
+          <div className="flex items-center gap-2 md:gap-3 w-full md:w-auto mt-2 md:mt-0 justify-end">
             <button className="p-2.5 md:p-3.5 bg-surface-low border border-outline-variant/30 rounded-full text-on-surface hover:bg-on-surface hover:text-white transition-colors shrink-0">
               <Filter size={18} />
             </button>

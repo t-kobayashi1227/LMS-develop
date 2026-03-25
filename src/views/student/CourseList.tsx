@@ -22,14 +22,6 @@ export default function CourseList({ onNavigate }: { onNavigate: (view: string) 
           </div>
 
           <div className="flex items-center gap-2 md:gap-3 w-full md:w-auto mt-2 md:mt-0">
-            <div className="relative flex items-center bg-surface-low rounded-full px-4 md:px-5 py-2.5 md:py-3 flex-1 md:w-72 border border-outline-variant/30 focus-within:border-on-surface transition-colors">
-              <Search size={18} className="text-secondary" />
-              <input 
-                type="text" 
-                placeholder="Search courses..." 
-                className="bg-transparent border-none focus:ring-0 text-sm w-full placeholder:text-secondary/50 ml-2 md:ml-3 outline-none"
-              />
-            </div>
             <button className="p-2.5 md:p-3.5 bg-surface-low border border-outline-variant/30 rounded-full text-on-surface hover:bg-on-surface hover:text-white transition-colors shrink-0">
               <Filter size={18} />
             </button>
