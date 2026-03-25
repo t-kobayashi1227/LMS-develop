@@ -1,18 +1,18 @@
-import React, { useEffect, useState } from 'react';
-import { BrainCircuit } from 'lucide-react';
+'use client';
 
-interface LoginProps {
-  onLogin: (role: 'student' | 'admin') => void;
+import { useRouter } from 'next/navigation';
+
+interface LoginFormProps {
+  isAdmin?: boolean;
 }
 
-export default function Login({ onLogin }: LoginProps) {
-  const [isAdminRoute, setIsAdminRoute] = useState(false);
+export default function LoginForm({ isAdmin = false }: LoginFormProps) {
+  const router = useRouter();
 
-  useEffect(() => {
-    if (window.location.pathname === '/admin') {
-      setIsAdminRoute(true);
-    }
-  }, []);
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    router.push(isAdmin ? '/admin/dashboard' : '/student/dashboard');
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-6 relative overflow-hidden">
@@ -22,55 +22,55 @@ export default function Login({ onLogin }: LoginProps) {
 
       <div className="w-full max-w-[440px] z-10">
         <div className="bg-surface-lowest p-8 md:p-10 rounded-3xl shadow-[0_40px_80px_rgba(0,64,161,0.08)] border border-outline-variant/10 bg-white">
-          
+
           {/* Header */}
           <div className="text-center mb-8">
             <div className="inline-flex items-center justify-center w-24 h-24 mb-6 rounded-2xl overflow-hidden bg-surface-container-low shadow-sm">
               <img src="/logo.png" alt="Niigata AI Academy" className="w-full h-full object-cover aspect-square" onError={(e) => { e.currentTarget.src = 'https://placehold.co/400x400/e2e8f0/475569?text=NAA'; }} />
             </div>
             <h1 className="text-3xl font-extrabold font-headline tracking-tight text-on-surface mb-2">
-              {isAdminRoute ? '管理者ログイン' : 'Niigata AI Academy'}
+              {isAdmin ? '管理者ログイン' : 'Niigata AI Academy'}
             </h1>
             <p className="text-on-surface-variant text-sm font-medium">
-              {isAdminRoute ? 'システム管理ダッシュボード' : 'Learning Management System'}
+              {isAdmin ? 'システム管理ダッシュボード' : 'Learning Management System'}
             </p>
           </div>
 
           {/* Form */}
-          <form className="space-y-5" onSubmit={(e) => { e.preventDefault(); onLogin(isAdminRoute ? 'admin' : 'student'); }}>
+          <form className="space-y-5" onSubmit={handleSubmit}>
             <div>
               <label htmlFor="email" className="block text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-2 ml-1">
                 メールアドレス
               </label>
-              <input 
-                type="email" 
-                id="email" 
-                placeholder={isAdminRoute ? "admin@example.com" : "student@example.com"}
+              <input
+                type="email"
+                id="email"
+                placeholder={isAdmin ? "admin@example.com" : "student@example.com"}
                 className="w-full px-4 py-3.5 bg-white border border-outline-variant/60 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all placeholder:text-outline/50 text-sm outline-none"
-                defaultValue={isAdminRoute ? "admin@example.com" : "student@example.com"}
+                defaultValue={isAdmin ? "admin@example.com" : "student@example.com"}
               />
             </div>
-            
+
             <div>
               <div className="flex justify-between items-center mb-2 ml-1">
                 <label htmlFor="password" className="block text-xs font-bold text-on-surface-variant uppercase tracking-wider">
                   パスワード
                 </label>
               </div>
-              <input 
-                type="password" 
-                id="password" 
-                placeholder="••••••••" 
+              <input
+                type="password"
+                id="password"
+                placeholder="••••••••"
                 className="w-full px-4 py-3.5 bg-white border border-outline-variant/60 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all placeholder:text-outline/50 text-sm outline-none"
                 defaultValue="password"
               />
             </div>
 
-            <button 
+            <button
               type="submit"
               className="w-full py-4 primary-gradient text-white font-bold rounded-xl shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 transition-all active:scale-[0.98] mt-2"
             >
-              {isAdminRoute ? '管理者としてログイン' : 'ログイン'}
+              {isAdmin ? '管理者としてログイン' : 'ログイン'}
             </button>
           </form>
 

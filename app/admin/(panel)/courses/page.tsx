@@ -1,13 +1,14 @@
-import React from 'react';
-import { Filter, Plus, Edit, Trash2, Eye, ChevronLeft, ChevronRight, BarChart2 } from 'lucide-react';
-import { mockCourses } from '../../mockData';
+'use client';
 
-export default function CourseList({ onNavigate }: { onNavigate: (view: string) => void }) {
+import { Filter, Plus, Edit, Trash2, Eye, ChevronLeft, ChevronRight, BarChart2 } from 'lucide-react';
+import { mockCourses } from '@/lib/mockData';
+
+export default function AdminCourseList() {
   const filteredCourses = mockCourses;
 
   return (
     <div className="animate-in fade-in duration-500 pb-24 overflow-x-hidden">
-      
+
       {/* Header Section */}
       <div className="px-4 md:px-8 pt-6 md:pt-16 pb-6 md:pb-8 max-w-7xl mx-auto">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 md:gap-8 mb-8">
@@ -99,7 +100,7 @@ export default function CourseList({ onNavigate }: { onNavigate: (view: string) 
               </tbody>
             </table>
           </div>
-          
+
           {/* Pagination */}
           <div className="px-6 py-4 border-t border-outline-variant/30 flex items-center justify-between">
             <div className="text-sm text-secondary">

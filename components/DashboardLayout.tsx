@@ -1,37 +1,43 @@
-import React from 'react';
-import { 
-  Home, BookOpen, BrainCircuit, MessageSquare, 
+'use client';
+
+import { usePathname, useRouter } from 'next/navigation';
+import Link from 'next/link';
+import {
+  Home, BookOpen, BrainCircuit, MessageSquare,
   Settings, LogOut, Bell, Users, BarChart3, Plus
 } from 'lucide-react';
-import { User } from '../types';
+import { User } from '@/lib/types';
 
-interface LayoutProps {
+interface DashboardLayoutProps {
   children: React.ReactNode;
   user: User;
-  currentView: string;
-  onNavigate: (view: string) => void;
-  onLogout: () => void;
 }
 
-export default function Layout({ children, user, currentView, onNavigate, onLogout }: LayoutProps) {
+export default function DashboardLayout({ children, user }: DashboardLayoutProps) {
+  const pathname = usePathname();
+  const router = useRouter();
   const isStudent = user.role === 'student';
 
   const studentNav = [
-    { id: 'dashboard', label: 'ホーム', icon: Home },
-    { id: 'courses', label: 'マイコース', icon: BookOpen },
-    { id: 'lesson', label: '学習ルーム', icon: BrainCircuit },
-    { id: 'messages', label: 'メッセージ', icon: MessageSquare },
+    { href: '/student/dashboard', label: 'ホーム', icon: Home },
+    { href: '/student/courses', label: 'マイコース', icon: BookOpen },
+    { href: '/student/lesson', label: '学習ルーム', icon: BrainCircuit },
+    { href: '/student/messages', label: 'メッセージ', icon: MessageSquare },
   ];
 
   const adminNav = [
-    { id: 'admin-dashboard', label: 'ダッシュボード', icon: Home },
-    { id: 'admin-users', label: '受講者管理', icon: Users },
-    { id: 'admin-courses', label: 'コース管理', icon: BookOpen },
-    { id: 'admin-messages', label: 'メッセージ', icon: MessageSquare },
-    { id: 'admin-analytics', label: '分析レポート', icon: BarChart3 },
+    { href: '/admin/dashboard', label: 'ダッシュボード', icon: Home },
+    { href: '/admin/users', label: '受講者管理', icon: Users },
+    { href: '/admin/courses', label: 'コース管理', icon: BookOpen },
+    { href: '/admin/messages', label: 'メッセージ', icon: MessageSquare },
+    { href: '/admin/analytics', label: '分析レポート', icon: BarChart3 },
   ];
 
   const navItems = isStudent ? studentNav : adminNav;
+
+  const handleLogout = () => {
+    router.push(isStudent ? '/' : '/admin');
+  };
 
   return (
     <div className="min-h-screen flex bg-background">
@@ -52,20 +58,20 @@ export default function Layout({ children, user, currentView, onNavigate, onLogo
         <nav className="flex-1 space-y-1 mt-4">
           {navItems.map((item) => {
             const Icon = item.icon;
-            const isActive = currentView === item.id;
+            const isActive = pathname === item.href;
             return (
-              <button
-                key={item.id}
-                onClick={() => onNavigate(item.id)}
+              <Link
+                key={item.href}
+                href={item.href}
                 className={`w-full flex items-center px-6 py-3 gap-3 transition-all duration-200 ${
-                  isActive 
-                    ? "text-white bg-blue-700/10 relative before:content-[''] before:absolute before:left-0 before:w-1 before:h-8 before:bg-primary before:rounded-r-full" 
+                  isActive
+                    ? "text-white bg-blue-700/10 relative before:content-[''] before:absolute before:left-0 before:w-1 before:h-8 before:bg-primary before:rounded-r-full"
                     : "text-slate-400 hover:text-slate-100 hover:bg-slate-800/50"
                 }`}
               >
                 <Icon size={20} />
                 <span className="font-headline text-sm font-medium">{item.label}</span>
-              </button>
+              </Link>
             );
           })}
         </nav>
@@ -84,8 +90,8 @@ export default function Layout({ children, user, currentView, onNavigate, onLogo
             <Settings size={20} />
             <span className="font-headline text-sm font-medium">設定</span>
           </button>
-          <button 
-            onClick={onLogout}
+          <button
+            onClick={handleLogout}
             className="w-full flex items-center px-6 py-3 gap-3 text-slate-400 hover:text-slate-100 hover:bg-slate-800/50 transition-all duration-200"
           >
             <LogOut size={20} />
@@ -131,18 +137,18 @@ export default function Layout({ children, user, currentView, onNavigate, onLogo
           <nav className="bg-on-surface/95 backdrop-blur-xl text-white px-6 py-3.5 rounded-full flex justify-between max-w-[320px] w-full shadow-2xl pointer-events-auto items-center">
             {navItems.slice(0, 4).map((item) => {
               const Icon = item.icon;
-              const isActive = currentView === item.id;
+              const isActive = pathname === item.href;
               return (
-                <button
-                  key={item.id}
-                  onClick={() => onNavigate(item.id)}
+                <Link
+                  key={item.href}
+                  href={item.href}
                   className={`flex flex-col items-center justify-center gap-1 transition-all ${
                     isActive ? 'text-white scale-110' : 'text-white/40 hover:text-white/80'
                   }`}
                 >
                   <Icon size={20} strokeWidth={isActive ? 2.5 : 1.5} />
                   {isActive && <span className="w-1 h-1 bg-white rounded-full mt-1 absolute -bottom-2"></span>}
-                </button>
+                </Link>
               );
             })}
           </nav>

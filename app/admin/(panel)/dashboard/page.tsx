@@ -1,11 +1,12 @@
-import React from 'react';
-import { Users, BookOpen, CheckCircle, Clock, ArrowRight, MessageSquare } from 'lucide-react';
-import { mockAssignments, mockMessages, mockCourses } from '../../mockData';
+'use client';
 
-export default function AdminDashboard({ onNavigate }: { onNavigate: (view: string) => void }) {
+import { Users, BookOpen, CheckCircle, Clock, ArrowRight, MessageSquare } from 'lucide-react';
+import { mockCourses } from '@/lib/mockData';
+
+export default function AdminDashboard() {
   return (
     <div className="p-8 max-w-7xl mx-auto space-y-12 animate-in fade-in duration-500">
-      
+
       {/* Header */}
       <div>
         <h2 className="text-3xl font-extrabold text-on-surface font-headline tracking-tight">
@@ -69,7 +70,7 @@ export default function AdminDashboard({ onNavigate }: { onNavigate: (view: stri
       </section>
 
       <section className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-        
+
         {/* Pending Assignments */}
         <div className="bg-white rounded-3xl shadow-[0_10px_30px_rgba(0,0,0,0.02)] border border-outline-variant/10 overflow-hidden flex flex-col">
           <div className="p-6 border-b border-outline-variant/10 flex items-center justify-between">
@@ -96,7 +97,7 @@ export default function AdminDashboard({ onNavigate }: { onNavigate: (view: stri
 
         {/* Recent Messages & Course Performance */}
         <div className="space-y-8">
-          
+
           {/* Unread Messages */}
           <div className="bg-white rounded-3xl shadow-[0_10px_30px_rgba(0,0,0,0.02)] border border-outline-variant/10 overflow-hidden">
             <div className="p-6 border-b border-outline-variant/10 flex items-center justify-between">

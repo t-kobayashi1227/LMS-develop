@@ -1,7 +1,10 @@
-import React, { useState } from 'react';
+'use client';
+
+import { useState } from 'react';
+import Link from 'next/link';
 import { ArrowLeft, PlayCircle, FileText, CheckCircle2, Lock, Download, Send, BrainCircuit, MonitorPlay, AlignLeft } from 'lucide-react';
 
-export default function LessonView({ onNavigate }: { onNavigate: (view: string) => void }) {
+export default function LessonView() {
   const [activeTab, setActiveTab] = useState<'content' | 'assignment'>('content');
   const [lessonMode, setLessonMode] = useState<'video' | 'text'>('text');
 
@@ -10,9 +13,9 @@ export default function LessonView({ onNavigate }: { onNavigate: (view: string) 
       {/* Lesson Header */}
       <header className="h-16 bg-on-secondary-fixed text-white flex items-center justify-between px-6 shrink-0 z-20">
         <div className="flex items-center gap-4">
-          <button onClick={() => onNavigate('dashboard')} className="p-2 hover:bg-white/10 rounded-full transition-colors">
+          <Link href="/student/dashboard" className="p-2 hover:bg-white/10 rounded-full transition-colors">
             <ArrowLeft size={20} />
-          </button>
+          </Link>
           <h1 className="font-bold text-sm md:text-base truncate max-w-xs md:max-w-md font-headline">
             AI時代のデジタル・エディトリアル戦略
           </h1>
@@ -20,14 +23,14 @@ export default function LessonView({ onNavigate }: { onNavigate: (view: string) 
         <div className="flex items-center gap-4">
           {/* Mode Toggle for Prototype Demonstration */}
           <div className="hidden md:flex items-center bg-white/10 rounded-lg p-1">
-            <button 
+            <button
               onClick={() => setLessonMode('video')}
               className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-bold transition-colors ${lessonMode === 'video' ? 'bg-white text-on-secondary-fixed' : 'text-white/70 hover:text-white'}`}
             >
               <MonitorPlay size={14} />
               動画
             </button>
-            <button 
+            <button
               onClick={() => setLessonMode('text')}
               className={`flex items-center gap-2 px-3 py-1.5 rounded-md text-xs font-bold transition-colors ${lessonMode === 'text' ? 'bg-white text-on-secondary-fixed' : 'text-white/70 hover:text-white'}`}
             >
@@ -40,11 +43,11 @@ export default function LessonView({ onNavigate }: { onNavigate: (view: string) 
             進捗: 85% (12/14)
           </span>
           {lessonMode === 'video' && (
-            <button 
+            <button
               onClick={() => setActiveTab('assignment')}
               className={`px-4 py-2 rounded-lg text-sm font-bold transition-all ${
-                activeTab === 'assignment' 
-                  ? 'bg-white text-on-secondary-fixed' 
+                activeTab === 'assignment'
+                  ? 'bg-white text-on-secondary-fixed'
                   : 'bg-primary hover:bg-primary-container text-white'
               }`}
             >
@@ -55,19 +58,19 @@ export default function LessonView({ onNavigate }: { onNavigate: (view: string) 
       </header>
 
       <div className="flex flex-col lg:flex-row flex-1 overflow-hidden">
-        
+
         {/* Main Content Area */}
         <div className="flex-1 overflow-y-auto bg-background flex flex-col relative">
-          
+
           {lessonMode === 'video' ? (
             /* VIDEO MODE */
             activeTab === 'content' ? (
               <>
                 {/* Video Player Mockup */}
                 <div className="aspect-video w-full bg-black relative group shrink-0">
-                  <img 
-                    src="https://placehold.co/1200x675/e2e8f0/475569?text=Video+Content" 
-                    alt="Video Content" 
+                  <img
+                    src="https://placehold.co/1200x675/e2e8f0/475569?text=Video+Content"
+                    alt="Video Content"
                     className="w-full h-full object-cover opacity-50"
                   />
                   <div className="absolute inset-0 flex items-center justify-center">
@@ -176,8 +179,8 @@ export default function LessonView({ onNavigate }: { onNavigate: (view: string) 
                     <label className="block text-sm font-bold text-on-surface mb-2">
                       回答を入力
                     </label>
-                    <textarea 
-                      rows={10} 
+                    <textarea
+                      rows={10}
                       className="w-full p-4 bg-white border border-outline-variant/30 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all resize-none outline-none text-sm"
                       placeholder="ここに作成したプロンプトを入力してください..."
                     ></textarea>
@@ -214,7 +217,7 @@ export default function LessonView({ onNavigate }: { onNavigate: (view: string) 
           ) : (
             /* TEXT MODE (Article + Embedded Form) */
             <div className="p-8 lg:p-16 max-w-3xl mx-auto w-full animate-in fade-in duration-500">
-              
+
               {/* Article Header */}
               <div className="mb-12 space-y-6">
                 <div className="flex items-center gap-3">
@@ -242,7 +245,7 @@ export default function LessonView({ onNavigate }: { onNavigate: (view: string) 
                 <p className="mb-6 leading-relaxed">
                   AIに対して指示を出す際、最も重要なのは「前提条件（コンテキスト）」を明確にすることです。単に「記事を書いて」と指示するのではなく、「誰に向けて」「どのような目的で」「どんなトーンで」書くのかを指定することで、出力の精度は劇的に向上します。
                 </p>
-                
+
                 <div className="bg-surface-container-low p-6 rounded-2xl border-l-4 border-primary mb-8">
                   <h4 className="font-bold text-sm text-primary uppercase tracking-widest mb-2">Bad Prompt</h4>
                   <p className="text-sm italic mb-4">「AIの導入メリットについての記事を書いてください。」</p>
@@ -266,9 +269,9 @@ export default function LessonView({ onNavigate }: { onNavigate: (view: string) 
                   </div>
                   <h3 className="text-2xl font-bold text-on-surface font-headline">理解度チェック＆課題</h3>
                 </div>
-                
+
                 <form className="space-y-8" onSubmit={(e) => e.preventDefault()}>
-                  
+
                   {/* Question 1: Multiple Choice */}
                   <div className="space-y-4">
                     <label className="block font-bold text-on-surface">
@@ -294,8 +297,8 @@ export default function LessonView({ onNavigate }: { onNavigate: (view: string) 
                       <p>・テーマ：ビジネスマナーの基本</p>
                       <p>・出力形式：箇条書き（3つのポイント）</p>
                     </div>
-                    <textarea 
-                      rows={5} 
+                    <textarea
+                      rows={5}
                       className="w-full p-4 bg-white border border-outline-variant/30 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all resize-none outline-none text-sm"
                       placeholder="プロンプトを入力..."
                     ></textarea>
@@ -321,13 +324,13 @@ export default function LessonView({ onNavigate }: { onNavigate: (view: string) 
             <h3 className="font-bold font-headline text-lg">コースの内容</h3>
             <p className="text-xs text-secondary mt-1">全24レッスン中 12完了</p>
           </div>
-          
+
           <div className="divide-y divide-surface-container-low">
             {/* Chapter 1 */}
             <div className="bg-surface p-4 sticky top-[89px] z-10 border-b border-outline-variant/10">
               <span className="text-[10px] font-bold text-secondary uppercase tracking-widest">セクション 1: 基礎理論</span>
             </div>
-            
+
             <div className="p-4 flex items-start gap-4 hover:bg-surface-container-low transition-colors cursor-pointer">
               <div className="mt-1 flex-shrink-0">
                 <CheckCircle2 size={20} className="text-primary" />
@@ -339,7 +342,7 @@ export default function LessonView({ onNavigate }: { onNavigate: (view: string) 
                 </p>
               </div>
             </div>
-            
+
             <div className="p-4 flex items-start gap-4 bg-primary/5 border-l-4 border-primary transition-colors cursor-pointer">
               <div className="mt-1 flex-shrink-0">
                 {lessonMode === 'video' ? <PlayCircle size={20} className="text-primary" /> : <FileText size={20} className="text-primary" />}
@@ -356,7 +359,7 @@ export default function LessonView({ onNavigate }: { onNavigate: (view: string) 
             <div className="bg-surface p-4 sticky top-[89px] z-10 border-b border-outline-variant/10 border-t">
               <span className="text-[10px] font-bold text-secondary uppercase tracking-widest">セクション 2: 実践演習</span>
             </div>
-            
+
             <div className="p-4 flex items-start gap-4 hover:bg-surface-container-low transition-colors cursor-pointer opacity-60">
               <div className="mt-1 flex-shrink-0">
                 <Lock size={18} className="text-slate-400" />
@@ -368,7 +371,7 @@ export default function LessonView({ onNavigate }: { onNavigate: (view: string) 
                 </p>
               </div>
             </div>
-            
+
             <div className="p-4 flex items-start gap-4 hover:bg-surface-container-low transition-colors cursor-pointer opacity-60">
               <div className="mt-1 flex-shrink-0">
                 <Lock size={18} className="text-slate-400" />

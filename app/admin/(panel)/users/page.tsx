@@ -1,18 +1,20 @@
-import React, { useState } from 'react';
-import { Search, Filter, MoreVertical, Mail, Edit, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
-import { mockStudents } from '../../mockData';
+'use client';
 
-export default function UserList({ onNavigate }: { onNavigate: (view: string) => void }) {
+import { useState } from 'react';
+import { Search, Filter, Mail, Edit, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
+import { mockStudents } from '@/lib/mockData';
+
+export default function AdminUserList() {
   const [searchTerm, setSearchTerm] = useState('');
 
-  const filteredStudents = mockStudents.filter(student => 
-    student.name.toLowerCase().includes(searchTerm.toLowerCase()) || 
+  const filteredStudents = mockStudents.filter(student =>
+    student.name.toLowerCase().includes(searchTerm.toLowerCase()) ||
     student.email.toLowerCase().includes(searchTerm.toLowerCase())
   );
 
   return (
     <div className="animate-in fade-in duration-500 pb-24 overflow-x-hidden">
-      
+
       {/* Header Section */}
       <div className="px-4 md:px-8 pt-6 md:pt-16 pb-6 md:pb-8 max-w-7xl mx-auto">
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 md:gap-8 mb-8">
@@ -28,9 +30,9 @@ export default function UserList({ onNavigate }: { onNavigate: (view: string) =>
           <div className="flex items-center gap-2 md:gap-3 w-full md:w-auto mt-2 md:mt-0">
             <div className="relative flex items-center bg-surface-low rounded-full px-4 md:px-5 py-2.5 md:py-3 flex-1 md:w-72 border border-outline-variant/30 focus-within:border-on-surface transition-colors">
               <Search size={18} className="text-secondary" />
-              <input 
-                type="text" 
-                placeholder="名前やメールアドレスで検索..." 
+              <input
+                type="text"
+                placeholder="名前やメールアドレスで検索..."
                 value={searchTerm}
                 onChange={(e) => setSearchTerm(e.target.value)}
                 className="bg-transparent border-none focus:ring-0 text-sm w-full placeholder:text-secondary/50 ml-2 md:ml-3 outline-none"
@@ -75,8 +77,8 @@ export default function UserList({ onNavigate }: { onNavigate: (view: string) =>
                     </td>
                     <td className="px-6 py-4 whitespace-nowrap">
                       <span className={`px-3 py-1 text-[10px] font-bold uppercase tracking-widest rounded-full ${
-                        student.status === 'active' 
-                          ? 'bg-green-500/10 text-green-600' 
+                        student.status === 'active'
+                          ? 'bg-green-500/10 text-green-600'
                           : 'bg-secondary/10 text-secondary'
                       }`}>
                         {student.status === 'active' ? 'アクティブ' : '非アクティブ'}
@@ -89,8 +91,8 @@ export default function UserList({ onNavigate }: { onNavigate: (view: string) =>
                       <div className="flex items-center gap-3">
                         <span className="text-sm font-bold text-on-surface w-8">{student.progress}%</span>
                         <div className="w-24 h-1.5 bg-surface-container-high rounded-full overflow-hidden">
-                          <div 
-                            className="h-full bg-primary rounded-full" 
+                          <div
+                            className="h-full bg-primary rounded-full"
                             style={{ width: `${student.progress}%` }}
                           ></div>
                         </div>
@@ -117,7 +119,7 @@ export default function UserList({ onNavigate }: { onNavigate: (view: string) =>
               </tbody>
             </table>
           </div>
-          
+
           {/* Pagination */}
           <div className="px-6 py-4 border-t border-outline-variant/30 flex items-center justify-between">
             <div className="text-sm text-secondary">
