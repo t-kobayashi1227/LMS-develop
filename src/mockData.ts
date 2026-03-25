@@ -4,14 +4,14 @@ export const currentUser: User = {
   id: 'u1',
   name: '田中 健太',
   role: 'student',
-  avatar: 'https://images.unsplash.com/photo-1599566150163-29194dcaad36?auto=format&fit=crop&q=80&w=100&h=100',
+  avatar: 'https://placehold.co/150x150/e2e8f0/475569?text=User',
 };
 
 export const adminUser: User = {
   id: 'a1',
   name: '佐藤 結衣',
   role: 'admin',
-  avatar: 'https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=100&h=100',
+  avatar: 'https://placehold.co/150x150/e2e8f0/475569?text=Admin',
 };
 
 export const mockCourses: Course[] = [
@@ -19,7 +19,7 @@ export const mockCourses: Course[] = [
     id: 'c1',
     title: 'AI時代のデジタル・エディトリアル戦略',
     description: 'プロンプトエンジニアリングを活用した高度な記事構成案の作成方法について学びます。',
-    thumbnail: 'https://images.unsplash.com/photo-1620712943543-bcc4688e7485?auto=format&fit=crop&q=80&w=600',
+    thumbnail: 'https://placehold.co/600x400/e2e8f0/475569?text=Course+1',
     progress: 65,
     totalLessons: 24,
     completedLessons: 15,
@@ -29,7 +29,7 @@ export const mockCourses: Course[] = [
     id: 'c2',
     title: 'データサイエンス入門：Python基礎',
     description: 'データ分析に必要なPythonの基本文法とライブラリの使い方を習得します。',
-    thumbnail: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=600',
+    thumbnail: 'https://placehold.co/600x400/e2e8f0/475569?text=Course+2',
     progress: 12,
     totalLessons: 18,
     completedLessons: 2,
@@ -39,7 +39,7 @@ export const mockCourses: Course[] = [
     id: 'c3',
     title: 'UXデザインの極意：プロレベルのUI構築',
     description: 'ユーザーの心を動かすインターフェース設計の原則と実践。',
-    thumbnail: 'https://images.unsplash.com/photo-1561070791-2526d30994b5?auto=format&fit=crop&q=80&w=600',
+    thumbnail: 'https://placehold.co/600x400/e2e8f0/475569?text=Course+3',
     progress: 0,
     totalLessons: 12,
     completedLessons: 0,
@@ -79,10 +79,63 @@ export const mockMessages: Message[] = [
     id: 'm2',
     senderId: 'sys',
     senderName: 'AI 学習アシスタント',
-    senderAvatar: 'https://images.unsplash.com/photo-1677442136019-21780ecad995?auto=format&fit=crop&q=80&w=100&h=100',
+    senderAvatar: 'https://placehold.co/150x150/e2e8f0/475569?text=AI',
     content: '✨ あなたの学習傾向を分析しました。週末にまとめて学習する傾向があるため、平日に15分の復習時間を設けることをお勧めします。',
     timestamp: '昨日',
     isUnread: false,
     type: 'system'
+  }
+];
+
+export const mockStudents = [
+  {
+    id: 'stu1',
+    name: '田中 健太',
+    email: 'kenta.tanaka@example.com',
+    avatar: 'https://placehold.co/150x150/e2e8f0/475569?text=Student',
+    enrolledCourses: 3,
+    progress: 65,
+    lastActive: '今日 14:30',
+    status: 'active'
+  },
+  {
+    id: 'stu2',
+    name: '鈴木 美咲',
+    email: 'misaki.suzuki@example.com',
+    avatar: 'https://placehold.co/150x150/e2e8f0/475569?text=Student',
+    enrolledCourses: 5,
+    progress: 82,
+    lastActive: '昨日 09:15',
+    status: 'active'
+  },
+  {
+    id: 'stu3',
+    name: '高橋 大輔',
+    email: 'daisuke.takahashi@example.com',
+    avatar: 'https://placehold.co/150x150/e2e8f0/475569?text=Student',
+    enrolledCourses: 2,
+    progress: 15,
+    lastActive: '3日前',
+    status: 'inactive'
+  },
+  {
+    id: 'stu4',
+    name: '渡辺 さくら',
+    email: 'sakura.watanabe@example.com',
+    avatar: 'https://placehold.co/150x150/e2e8f0/475569?text=Student',
+    enrolledCourses: 4,
+    progress: 45,
+    lastActive: '今日 10:00',
+    status: 'active'
+  },
+  {
+    id: 'stu5',
+    name: '伊藤 誠',
+    email: 'makoto.ito@example.com',
+    avatar: 'https://placehold.co/150x150/e2e8f0/475569?text=Student',
+    enrolledCourses: 1,
+    progress: 0,
+    lastActive: '1週間前',
+    status: 'inactive'
   }
 ];

@@ -66,7 +66,7 @@ export default function LessonView({ onNavigate }: { onNavigate: (view: string) 
                 {/* Video Player Mockup */}
                 <div className="aspect-video w-full bg-black relative group shrink-0">
                   <img 
-                    src="https://images.unsplash.com/photo-1516321318423-f06f85e504b3?auto=format&fit=crop&q=80&w=1200" 
+                    src="https://placehold.co/1200x675/e2e8f0/475569?text=Video+Content" 
                     alt="Video Content" 
                     className="w-full h-full object-cover opacity-50"
                   />

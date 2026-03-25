@@ -80,7 +80,7 @@ export default function AdminDashboard({ onNavigate }: { onNavigate: (view: stri
             {[1, 2, 3].map((i) => (
               <div key={i} className="p-6 hover:bg-surface-container-low transition-colors flex items-center justify-between group cursor-pointer">
                 <div className="flex items-center gap-4">
-                  <img src={`https://i.pravatar.cc/150?img=${i+10}`} alt="Student" className="w-10 h-10 rounded-full object-cover" />
+                  <img src={`https://placehold.co/150x150/e2e8f0/475569?text=Student`} alt="Student" className="w-10 h-10 rounded-full object-cover" />
                   <div>
                     <p className="text-sm font-bold text-on-surface group-hover:text-primary transition-colors">ペルソナ設定プロンプトの作成</p>
                     <p className="text-xs text-secondary mt-1">佐藤 美咲 • 2時間前</p>
@@ -108,7 +108,7 @@ export default function AdminDashboard({ onNavigate }: { onNavigate: (view: stri
             <div className="p-6 space-y-4">
               <div className="p-4 bg-surface-container-low rounded-xl cursor-pointer hover:bg-surface-container-high transition-colors">
                 <div className="flex items-center gap-3 mb-2">
-                  <img src="https://i.pravatar.cc/150?img=32" alt="Student" className="w-6 h-6 rounded-full object-cover" />
+                  <img src="https://placehold.co/150x150/e2e8f0/475569?text=Student" alt="Student" className="w-6 h-6 rounded-full object-cover" />
                   <span className="text-xs font-bold text-on-surface">田中 健太</span>
                   <span className="text-[10px] text-secondary ml-auto">10:30</span>
                 </div>
@@ -118,7 +118,7 @@ export default function AdminDashboard({ onNavigate }: { onNavigate: (view: stri
               </div>
               <div className="p-4 bg-surface-container-low rounded-xl cursor-pointer hover:bg-surface-container-high transition-colors">
                 <div className="flex items-center gap-3 mb-2">
-                  <img src="https://i.pravatar.cc/150?img=45" alt="Student" className="w-6 h-6 rounded-full object-cover" />
+                  <img src="https://placehold.co/150x150/e2e8f0/475569?text=Student" alt="Student" className="w-6 h-6 rounded-full object-cover" />
                   <span className="text-xs font-bold text-on-surface">鈴木 一郎</span>
                   <span className="text-[10px] text-secondary ml-auto">昨日</span>
                 </div>

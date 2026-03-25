@@ -39,12 +39,12 @@ export default function Layout({ children, user, currentView, onNavigate, onLogo
       <aside className="fixed left-0 top-0 h-screen w-64 bg-on-secondary-fixed flex flex-col py-6 z-40 hidden lg:flex">
         <div className="px-6 mb-8">
           <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-full bg-primary-container flex items-center justify-center text-white">
-              <BrainCircuit size={20} />
+            <div className="w-10 h-10 flex items-center justify-center rounded-lg overflow-hidden bg-white/5 shrink-0">
+              <img src="/logo.png" alt="Niigata AI Academy" className="w-full h-full object-cover aspect-square" onError={(e) => { e.currentTarget.src = 'https://placehold.co/400x400/1e293b/94a3b8?text=NAA'; }} />
             </div>
-            <div>
-              <h2 className="text-lg font-extrabold text-white tracking-widest leading-none font-headline">Digital Mentor</h2>
-              <p className="text-[10px] text-slate-500 uppercase tracking-tighter">Intelligence Suite</p>
+            <div className="flex flex-col justify-center">
+              <h2 className="text-[15px] font-extrabold text-white tracking-wide leading-none font-headline mb-1.5">Niigata AI Academy</h2>
+              <span className="text-[9px] text-slate-400 font-medium tracking-wider leading-none">Learning Management System</span>
             </div>
           </div>
         </div>
@@ -100,12 +100,12 @@ export default function Layout({ children, user, currentView, onNavigate, onLogo
         <header className="sticky top-0 z-30 h-14 md:h-20 bg-background/90 backdrop-blur-xl flex justify-between items-center px-5 md:px-8">
           <div className="flex items-center gap-8">
             <h1 className="text-xl font-bold text-on-surface font-headline hidden md:block tracking-tight">
-              Editorial Intelligence
+              Niigata AI Academy
             </h1>
             {/* Minimal Mobile Logo */}
             <div className="lg:hidden flex items-center gap-2">
-              <div className="w-7 h-7 rounded-full bg-on-surface flex items-center justify-center text-white">
-                <BrainCircuit size={14} />
+              <div className="w-8 h-8 flex items-center justify-center rounded-md overflow-hidden bg-surface-container-low shrink-0">
+                <img src="/logo.png" alt="Niigata AI Academy" className="w-full h-full object-cover aspect-square" onError={(e) => { e.currentTarget.src = 'https://placehold.co/400x400/e2e8f0/475569?text=NAA'; }} />
               </div>
             </div>
           </div>

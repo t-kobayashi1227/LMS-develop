@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useEffect, useState } from 'react';
 import { BrainCircuit } from 'lucide-react';
 
 interface LoginProps {
@@ -6,6 +6,14 @@ interface LoginProps {
 }
 
 export default function Login({ onLogin }: LoginProps) {
+  const [isAdminRoute, setIsAdminRoute] = useState(false);
+
+  useEffect(() => {
+    if (window.location.pathname === '/admin') {
+      setIsAdminRoute(true);
+    }
+  }, []);
+
   return (
     <div className="min-h-screen flex items-center justify-center bg-background p-6 relative overflow-hidden">
       {/* Abstract Background Decorative Elements */}
@@ -17,38 +25,19 @@ export default function Login({ onLogin }: LoginProps) {
           
           {/* Header */}
           <div className="text-center mb-8">
-            <div className="inline-flex items-center justify-center w-16 h-16 rounded-2xl bg-primary-container text-white mb-6 shadow-lg shadow-primary/20">
-              <BrainCircuit size={32} />
+            <div className="inline-flex items-center justify-center w-24 h-24 mb-6 rounded-2xl overflow-hidden bg-surface-container-low shadow-sm">
+              <img src="/logo.png" alt="Niigata AI Academy" className="w-full h-full object-cover aspect-square" onError={(e) => { e.currentTarget.src = 'https://placehold.co/400x400/e2e8f0/475569?text=NAA'; }} />
             </div>
             <h1 className="text-3xl font-extrabold font-headline tracking-tight text-on-surface mb-2">
-              Editorial Intelligence
+              {isAdminRoute ? '管理者ログイン' : 'Niigata AI Academy'}
             </h1>
             <p className="text-on-surface-variant text-sm font-medium">
-              学習を再定義する、インテリジェントな体験
+              {isAdminRoute ? 'システム管理ダッシュボード' : 'Learning Management System'}
             </p>
           </div>
 
-          {/* Social Login */}
-          <button 
-            onClick={() => onLogin('student')}
-            className="w-full flex items-center justify-center gap-3 py-3.5 px-4 bg-white border border-outline-variant/30 rounded-xl hover:bg-surface-container-low transition-all duration-200 group mb-6"
-          >
-            <img 
-              src="https://www.svgrepo.com/show/475656/google-color.svg" 
-              alt="Google" 
-              className="w-5 h-5" 
-            />
-            <span className="text-on-surface font-semibold text-sm">Googleでログイン (受講者)</span>
-          </button>
-
-          <div className="relative flex items-center mb-6">
-            <div className="flex-grow border-t border-outline-variant/30"></div>
-            <span className="flex-shrink mx-4 text-outline text-[10px] uppercase tracking-widest font-bold">または</span>
-            <div className="flex-grow border-t border-outline-variant/30"></div>
-          </div>
-
           {/* Form */}
-          <form className="space-y-5" onSubmit={(e) => { e.preventDefault(); onLogin('admin'); }}>
+          <form className="space-y-5" onSubmit={(e) => { e.preventDefault(); onLogin(isAdminRoute ? 'admin' : 'student'); }}>
             <div>
               <label htmlFor="email" className="block text-xs font-bold text-on-surface-variant uppercase tracking-wider mb-2 ml-1">
                 メールアドレス
@@ -56,9 +45,9 @@ export default function Login({ onLogin }: LoginProps) {
               <input 
                 type="email" 
                 id="email" 
-                placeholder="admin@example.com" 
-                className="w-full px-4 py-3.5 bg-surface-container-low border-transparent rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all placeholder:text-outline/50 text-sm outline-none"
-                defaultValue="admin@example.com"
+                placeholder={isAdminRoute ? "admin@example.com" : "student@example.com"}
+                className="w-full px-4 py-3.5 bg-white border border-outline-variant/60 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all placeholder:text-outline/50 text-sm outline-none"
+                defaultValue={isAdminRoute ? "admin@example.com" : "student@example.com"}
               />
             </div>
             
@@ -72,7 +61,7 @@ export default function Login({ onLogin }: LoginProps) {
                 type="password" 
                 id="password" 
                 placeholder="••••••••" 
-                className="w-full px-4 py-3.5 bg-surface-container-low border-transparent rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all placeholder:text-outline/50 text-sm outline-none"
+                className="w-full px-4 py-3.5 bg-white border border-outline-variant/60 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all placeholder:text-outline/50 text-sm outline-none"
                 defaultValue="password"
               />
             </div>
@@ -81,7 +70,7 @@ export default function Login({ onLogin }: LoginProps) {
               type="submit"
               className="w-full py-4 primary-gradient text-white font-bold rounded-xl shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 transition-all active:scale-[0.98] mt-2"
             >
-              管理者としてログイン
+              {isAdminRoute ? '管理者としてログイン' : 'ログイン'}
             </button>
           </form>
 

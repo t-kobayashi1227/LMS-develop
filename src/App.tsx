@@ -6,6 +6,8 @@ import StudentDashboard from './views/student/Dashboard';
 import CourseList from './views/student/CourseList';
 import LessonView from './views/student/LessonView';
 import AdminDashboard from './views/admin/Dashboard';
+import AdminUserList from './views/admin/UserList';
+import AdminCourseList from './views/admin/CourseList';
 
 export default function App() {
   const [role, setRole] = useState<'student' | 'admin' | null>(null);
@@ -39,10 +41,12 @@ export default function App() {
         return <CourseList onNavigate={setCurrentView} />;
       case 'admin-dashboard':
         return <AdminDashboard onNavigate={setCurrentView} />;
+      case 'admin-users':
+        return <AdminUserList onNavigate={setCurrentView} />;
+      case 'admin-courses':
+        return <AdminCourseList onNavigate={setCurrentView} />;
       case 'messages':
       case 'admin-messages':
-      case 'admin-users':
-      case 'admin-courses':
       case 'admin-analytics':
         return (
           <div className="flex-1 flex items-center justify-center p-8 h-[60vh]">
