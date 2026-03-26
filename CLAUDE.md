@@ -70,3 +70,4 @@ ProgressBar.tsx     → プログレスバー（Server Component）
 - ナビ項目追加時は `lib/navigation.ts` を編集
 - アイコンのみのボタンには `aria-label` を付与
 - モバイルでタッチ不可の `hover:opacity` パターンは使わない（`opacity-100 lg:opacity-0 lg:group-hover:opacity-100` で対応）
+- 機能追加・データモデル変更時は `docs/database-schema.md` も必ず更新する（テーブル定義、ER図、クエリパターン、フロントエンド型対応表）
