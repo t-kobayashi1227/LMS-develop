@@ -102,9 +102,9 @@ class AdminCourseController extends Controller
             'status' => 'sometimes|in:draft,published,archived',
         ]);
 
-        if (isset($validated['title'])) $course->title = $validated['title'];
+        if (array_key_exists('title', $validated)) $course->title = $validated['title'];
         if (array_key_exists('description', $validated)) $course->description = $validated['description'];
-        if (isset($validated['categoryId'])) $course->course_category_id = $validated['categoryId'];
+        if (array_key_exists('categoryId', $validated)) $course->course_category_id = $validated['categoryId'];
         if (isset($validated['status'])) {
             $course->status = $validated['status'];
             if ($validated['status'] === 'published' && !$course->published_at) {
@@ -208,13 +208,13 @@ class AdminCourseController extends Controller
             'sortOrder' => 'sometimes|integer|min:0',
         ]);
 
-        if (isset($validated['title'])) $lesson->title = $validated['title'];
-        if (isset($validated['type'])) $lesson->type = $validated['type'];
-        if (isset($validated['hasVideo'])) $lesson->has_video = $validated['hasVideo'];
+        if (array_key_exists('title', $validated)) $lesson->title = $validated['title'];
+        if (array_key_exists('type', $validated)) $lesson->type = $validated['type'];
+        if (array_key_exists('hasVideo', $validated)) $lesson->has_video = $validated['hasVideo'];
         if (array_key_exists('videoUrl', $validated)) $lesson->video_url = $validated['videoUrl'];
         if (array_key_exists('contentBody', $validated)) $lesson->content_body = $validated['contentBody'];
         if (array_key_exists('durationSeconds', $validated)) $lesson->duration_seconds = $validated['durationSeconds'];
-        if (isset($validated['sortOrder'])) $lesson->sort_order = $validated['sortOrder'];
+        if (array_key_exists('sortOrder', $validated)) $lesson->sort_order = $validated['sortOrder'];
         $lesson->save();
 
         return response()->json(['data' => ['id' => $lesson->uuid]]);

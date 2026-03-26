@@ -1,7 +1,6 @@
 'use client';
 
-import { useState } from 'react';
-import { useRouter } from 'next/navigation';
+import { useState, useCallback } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, Save, Plus, Trash2, ChevronDown, ChevronUp, GripVertical, Video, FileText, ClipboardList, HelpCircle } from 'lucide-react';
 
@@ -53,11 +52,14 @@ async function apiCall(path: string, method: string, body?: unknown) {
     headers: { 'Content-Type': 'application/json' },
     ...(body ? { body: JSON.stringify(body) } : {}),
   });
+  if (!res.ok) {
+    const err = await res.json().catch(() => ({}));
+    throw new Error(err.message || `API error: ${res.status}`);
+  }
   return res.json();
 }
 
 export default function CourseEditor({ course: initial, categories }: Props) {
-  const router = useRouter();
   const [course, setCourse] = useState(initial);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');
@@ -66,17 +68,41 @@ export default function CourseEditor({ course: initial, categories }: Props) {
   );
   const [editingLesson, setEditingLesson] = useState<string | null>(null);
 
+  // ── State update helpers ──────────────────────────
+  const updateLessonLocal = useCallback((lessonId: string, updates: Partial<LessonData>) => {
+    setCourse(prev => ({
+      ...prev,
+      chapters: prev.chapters.map(ch => ({
+        ...ch,
+        lessons: ch.lessons.map(l => l.id === lessonId ? { ...l, ...updates } : l),
+      })),
+    }));
+  }, []);
+
+  const updateChapterLocal = useCallback((chapterId: string, updates: Partial<ChapterData>) => {
+    setCourse(prev => ({
+      ...prev,
+      chapters: prev.chapters.map(ch => ch.id === chapterId ? { ...ch, ...updates } : ch),
+    }));
+  }, []);
+
+  // ── Course actions ─────────────────────────────────
   const saveCourse = async () => {
     setSaving(true);
     setMessage('');
-    await apiCall(`courses/${course.id}`, 'PUT', {
-      title: course.title,
-      description: course.description,
-      status: course.status,
-    });
-    setMessage('保存しました');
-    setSaving(false);
-    setTimeout(() => setMessage(''), 3000);
+    try {
+      await apiCall(`courses/${course.id}`, 'PUT', {
+        title: course.title,
+        description: course.description,
+        status: course.status,
+      });
+      setMessage('保存しました');
+      setTimeout(() => setMessage(''), 3000);
+    } catch {
+      setMessage('保存に失敗しました');
+    } finally {
+      setSaving(false);
+    }
   };
 
   const addChapter = async () => {
@@ -103,12 +129,8 @@ export default function CourseEditor({ course: initial, categories }: Props) {
     }));
   };
 
-  const updateChapterTitle = async (chapterId: string, title: string) => {
+  const saveChapterTitle = async (chapterId: string, title: string) => {
     await apiCall(`chapters/${chapterId}`, 'PUT', { title });
-    setCourse(prev => ({
-      ...prev,
-      chapters: prev.chapters.map(ch => ch.id === chapterId ? { ...ch, title } : ch),
-    }));
   };
 
   const addLesson = async (chapterId: string) => {
@@ -135,15 +157,8 @@ export default function CourseEditor({ course: initial, categories }: Props) {
     }));
   };
 
-  const updateLesson = async (lessonId: string, updates: Partial<LessonData>) => {
+  const saveLesson = async (lessonId: string, updates: Partial<LessonData>) => {
     await apiCall(`lessons/${lessonId}`, 'PUT', updates);
-    setCourse(prev => ({
-      ...prev,
-      chapters: prev.chapters.map(ch => ({
-        ...ch,
-        lessons: ch.lessons.map(l => l.id === lessonId ? { ...l, ...updates } : l),
-      })),
-    }));
   };
 
   const deleteLesson = async (lessonId: string) => {
@@ -208,7 +223,6 @@ export default function CourseEditor({ course: initial, categories }: Props) {
 
   return (
     <div className="animate-in fade-in duration-500 pb-24">
-      {/* Header */}
       <div className="px-4 md:px-8 pt-6 md:pt-10 pb-6 max-w-5xl mx-auto">
         <Link href="/admin/courses" className="inline-flex items-center gap-2 text-sm text-secondary hover:text-on-surface transition-colors mb-6">
           <ArrowLeft size={16} /> コース管理に戻る
@@ -223,7 +237,7 @@ export default function CourseEditor({ course: initial, categories }: Props) {
             placeholder="コースタイトル"
           />
           <div className="flex items-center gap-3 shrink-0">
-            {message && <span className="text-sm text-green-600 font-medium">{message}</span>}
+            {message && <span className={`text-sm font-medium ${message.includes('失敗') ? 'text-red-500' : 'text-green-600'}`}>{message}</span>}
             <select
               value={course.status}
               onChange={e => setCourse(prev => ({ ...prev, status: e.target.value }))}
@@ -253,11 +267,9 @@ export default function CourseEditor({ course: initial, categories }: Props) {
         />
       </div>
 
-      {/* Chapters & Lessons */}
       <div className="px-4 md:px-8 max-w-5xl mx-auto space-y-4">
-        {course.chapters.map((chapter, chIdx) => (
+        {course.chapters.map((chapter) => (
           <div key={chapter.id} className="bg-white rounded-2xl border border-outline-variant/20 overflow-hidden">
-            {/* Chapter Header */}
             <div
               className="flex items-center gap-3 px-5 py-4 cursor-pointer hover:bg-surface-container-low/50 transition-colors"
               onClick={() => setExpandedChapter(expandedChapter === chapter.id ? null : chapter.id)}
@@ -266,14 +278,8 @@ export default function CourseEditor({ course: initial, categories }: Props) {
               <input
                 type="text"
                 value={chapter.title}
-                onChange={e => {
-                  const val = e.target.value;
-                  setCourse(prev => ({
-                    ...prev,
-                    chapters: prev.chapters.map(ch => ch.id === chapter.id ? { ...ch, title: val } : ch),
-                  }));
-                }}
-                onBlur={() => updateChapterTitle(chapter.id, chapter.title)}
+                onChange={e => updateChapterLocal(chapter.id, { title: e.target.value })}
+                onBlur={() => saveChapterTitle(chapter.id, chapter.title)}
                 onClick={e => e.stopPropagation()}
                 className="flex-1 font-bold text-on-surface bg-transparent outline-none"
               />
@@ -284,12 +290,10 @@ export default function CourseEditor({ course: initial, categories }: Props) {
               {expandedChapter === chapter.id ? <ChevronUp size={16} className="text-slate-400" /> : <ChevronDown size={16} className="text-slate-400" />}
             </div>
 
-            {/* Lessons */}
             {expandedChapter === chapter.id && (
               <div className="border-t border-outline-variant/10">
                 {chapter.lessons.map((lesson) => (
                   <div key={lesson.id} className="border-b border-outline-variant/10 last:border-b-0">
-                    {/* Lesson Row */}
                     <div
                       className="flex items-center gap-3 px-5 py-3 pl-10 hover:bg-surface-container-low/30 transition-colors cursor-pointer"
                       onClick={() => setEditingLesson(editingLesson === lesson.id ? null : lesson.id)}
@@ -311,7 +315,6 @@ export default function CourseEditor({ course: initial, categories }: Props) {
                       </button>
                     </div>
 
-                    {/* Lesson Edit Panel */}
                     {editingLesson === lesson.id && (
                       <div className="px-10 py-4 bg-surface-container-low/30 space-y-4">
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -320,14 +323,8 @@ export default function CourseEditor({ course: initial, categories }: Props) {
                             <input
                               type="text"
                               value={lesson.title}
-                              onChange={e => setCourse(prev => ({
-                                ...prev,
-                                chapters: prev.chapters.map(ch => ({
-                                  ...ch,
-                                  lessons: ch.lessons.map(l => l.id === lesson.id ? { ...l, title: e.target.value } : l),
-                                })),
-                              }))}
-                              onBlur={() => updateLesson(lesson.id, { title: lesson.title })}
+                              onChange={e => updateLessonLocal(lesson.id, { title: e.target.value })}
+                              onBlur={() => saveLesson(lesson.id, { title: lesson.title })}
                               className="w-full px-3 py-2 bg-white border border-outline-variant/30 rounded-lg text-sm outline-none"
                             />
                           </div>
@@ -336,7 +333,11 @@ export default function CourseEditor({ course: initial, categories }: Props) {
                               <label className="block text-xs font-bold text-secondary uppercase tracking-widest mb-1.5">種別</label>
                               <select
                                 value={lesson.type}
-                                onChange={e => updateLesson(lesson.id, { type: e.target.value })}
+                                onChange={e => {
+                                  const type = e.target.value;
+                                  updateLessonLocal(lesson.id, { type });
+                                  saveLesson(lesson.id, { type });
+                                }}
                                 className="w-full px-3 py-2 bg-white border border-outline-variant/30 rounded-lg text-sm outline-none"
                               >
                                 <option value="text">テキスト</option>
@@ -349,14 +350,8 @@ export default function CourseEditor({ course: initial, categories }: Props) {
                               <input
                                 type="number"
                                 value={lesson.durationSeconds ?? ''}
-                                onChange={e => setCourse(prev => ({
-                                  ...prev,
-                                  chapters: prev.chapters.map(ch => ({
-                                    ...ch,
-                                    lessons: ch.lessons.map(l => l.id === lesson.id ? { ...l, durationSeconds: e.target.value ? Number(e.target.value) : null } : l),
-                                  })),
-                                }))}
-                                onBlur={() => updateLesson(lesson.id, { durationSeconds: lesson.durationSeconds })}
+                                onChange={e => updateLessonLocal(lesson.id, { durationSeconds: e.target.value ? Number(e.target.value) : null })}
+                                onBlur={() => saveLesson(lesson.id, { durationSeconds: lesson.durationSeconds })}
                                 className="w-full px-3 py-2 bg-white border border-outline-variant/30 rounded-lg text-sm outline-none"
                               />
                             </div>
@@ -368,14 +363,8 @@ export default function CourseEditor({ course: initial, categories }: Props) {
                           <input
                             type="text"
                             value={lesson.videoUrl ?? ''}
-                            onChange={e => setCourse(prev => ({
-                              ...prev,
-                              chapters: prev.chapters.map(ch => ({
-                                ...ch,
-                                lessons: ch.lessons.map(l => l.id === lesson.id ? { ...l, videoUrl: e.target.value || null, hasVideo: !!e.target.value } : l),
-                              })),
-                            }))}
-                            onBlur={() => updateLesson(lesson.id, { videoUrl: lesson.videoUrl, hasVideo: !!lesson.videoUrl })}
+                            onChange={e => updateLessonLocal(lesson.id, { videoUrl: e.target.value || null, hasVideo: !!e.target.value })}
+                            onBlur={() => saveLesson(lesson.id, { videoUrl: lesson.videoUrl, hasVideo: !!lesson.videoUrl })}
                             className="w-full px-3 py-2 bg-white border border-outline-variant/30 rounded-lg text-sm outline-none"
                             placeholder="https://example.com/video.mp4"
                           />
@@ -385,21 +374,14 @@ export default function CourseEditor({ course: initial, categories }: Props) {
                           <label className="block text-xs font-bold text-secondary uppercase tracking-widest mb-1.5">本文コンテンツ (HTML)</label>
                           <textarea
                             value={lesson.contentBody ?? ''}
-                            onChange={e => setCourse(prev => ({
-                              ...prev,
-                              chapters: prev.chapters.map(ch => ({
-                                ...ch,
-                                lessons: ch.lessons.map(l => l.id === lesson.id ? { ...l, contentBody: e.target.value || null } : l),
-                              })),
-                            }))}
-                            onBlur={() => updateLesson(lesson.id, { contentBody: lesson.contentBody })}
+                            onChange={e => updateLessonLocal(lesson.id, { contentBody: e.target.value || null })}
+                            onBlur={() => saveLesson(lesson.id, { contentBody: lesson.contentBody })}
                             rows={6}
                             className="w-full px-3 py-2 bg-white border border-outline-variant/30 rounded-lg text-sm outline-none font-mono resize-y"
                             placeholder="<h3>見出し</h3><p>本文...</p>"
                           />
                         </div>
 
-                        {/* Quiz Questions */}
                         <div>
                           <div className="flex items-center justify-between mb-2">
                             <label className="text-xs font-bold text-secondary uppercase tracking-widest flex items-center gap-1.5">
@@ -426,7 +408,6 @@ export default function CourseEditor({ course: initial, categories }: Props) {
                   </div>
                 ))}
 
-                {/* Add Lesson Button */}
                 <button
                   onClick={() => addLesson(chapter.id)}
                   className="w-full px-5 py-3 text-sm text-primary font-bold hover:bg-primary/5 transition-colors flex items-center gap-2 pl-10"
@@ -438,7 +419,6 @@ export default function CourseEditor({ course: initial, categories }: Props) {
           </div>
         ))}
 
-        {/* Add Chapter Button */}
         <button
           onClick={addChapter}
           className="w-full py-4 border-2 border-dashed border-outline-variant/30 rounded-2xl text-sm text-secondary font-bold hover:border-primary hover:text-primary transition-colors flex items-center justify-center gap-2"
