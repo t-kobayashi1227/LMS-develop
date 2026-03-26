@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Image from 'next/image';
+import Link from 'next/link';
 import { Filter, Plus, Edit, Trash2, Eye, ChevronLeft, ChevronRight, BarChart2 } from 'lucide-react';
 import { getCourses } from '@/lib/api';
 
@@ -88,9 +89,9 @@ export default async function AdminCourseList() {
                         <button className="p-2 text-secondary hover:text-primary transition-colors rounded-full hover:bg-surface-container-high" aria-label="分析">
                           <BarChart2 size={16} />
                         </button>
-                        <button className="p-2 text-secondary hover:text-on-surface transition-colors rounded-full hover:bg-surface-container-high" aria-label="編集">
+                        <Link href={`/admin/courses/${course.id}`} className="p-2 text-secondary hover:text-on-surface transition-colors rounded-full hover:bg-surface-container-high" aria-label="編集">
                           <Edit size={16} />
-                        </button>
+                        </Link>
                         <button className="p-2 text-secondary hover:text-red-500 transition-colors rounded-full hover:bg-surface-container-high" aria-label="削除">
                           <Trash2 size={16} />
                         </button>

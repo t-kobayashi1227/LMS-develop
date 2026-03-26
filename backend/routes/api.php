@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\V1\AnalyticsController;
 use App\Http\Controllers\Api\V1\AssignmentController;
 use App\Http\Controllers\Api\V1\AuthController;
+use App\Http\Controllers\Api\V1\AdminCourseController;
 use App\Http\Controllers\Api\V1\CourseController;
 use App\Http\Controllers\Api\V1\LessonController;
 use App\Http\Controllers\Api\V1\StudentController;
@@ -34,6 +35,28 @@ Route::prefix('v1')->group(function () {
             Route::get('/analytics/monthly-students', [AnalyticsController::class, 'monthlyStudents']);
             Route::get('/analytics/course-performance', [AnalyticsController::class, 'coursePerformance']);
             Route::get('/analytics/recent-activity', [AnalyticsController::class, 'recentActivity']);
+
+            // Course CRUD
+            Route::get('/admin/courses', [AdminCourseController::class, 'index']);
+            Route::post('/admin/courses', [AdminCourseController::class, 'store']);
+            Route::get('/admin/courses/{uuid}', [AdminCourseController::class, 'show']);
+            Route::put('/admin/courses/{uuid}', [AdminCourseController::class, 'update']);
+            Route::delete('/admin/courses/{uuid}', [AdminCourseController::class, 'destroy']);
+
+            // Chapter CRUD
+            Route::post('/admin/courses/{courseUuid}/chapters', [AdminCourseController::class, 'storeChapter']);
+            Route::put('/admin/chapters/{uuid}', [AdminCourseController::class, 'updateChapter']);
+            Route::delete('/admin/chapters/{uuid}', [AdminCourseController::class, 'destroyChapter']);
+
+            // Lesson CRUD
+            Route::post('/admin/chapters/{chapterUuid}/lessons', [AdminCourseController::class, 'storeLesson']);
+            Route::put('/admin/lessons/{uuid}', [AdminCourseController::class, 'updateLesson']);
+            Route::delete('/admin/lessons/{uuid}', [AdminCourseController::class, 'destroyLesson']);
+
+            // Quiz CRUD
+            Route::post('/admin/lessons/{lessonUuid}/quiz', [AdminCourseController::class, 'storeQuiz']);
+            Route::put('/admin/quiz/{uuid}', [AdminCourseController::class, 'updateQuiz']);
+            Route::delete('/admin/quiz/{uuid}', [AdminCourseController::class, 'destroyQuiz']);
         });
     });
 });
