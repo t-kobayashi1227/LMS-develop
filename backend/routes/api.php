@@ -4,6 +4,7 @@ use App\Http\Controllers\Api\V1\AnalyticsController;
 use App\Http\Controllers\Api\V1\AssignmentController;
 use App\Http\Controllers\Api\V1\AuthController;
 use App\Http\Controllers\Api\V1\CourseController;
+use App\Http\Controllers\Api\V1\LessonController;
 use App\Http\Controllers\Api\V1\StudentController;
 use App\Http\Middleware\EnsureAdmin;
 use App\Http\Middleware\UpdateLastActive;
@@ -21,6 +22,9 @@ Route::prefix('v1')->group(function () {
 
         // Student / shared
         Route::get('/courses', [CourseController::class, 'index']);
+        Route::get('/courses/{courseUuid}/chapters', [LessonController::class, 'chapters']);
+        Route::get('/lessons/{lessonUuid}', [LessonController::class, 'show']);
+        Route::post('/lessons/{lessonUuid}/progress', [LessonController::class, 'updateProgress']);
         Route::get('/assignments', [AssignmentController::class, 'index']);
 
         // Admin only

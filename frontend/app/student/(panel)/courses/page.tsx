@@ -53,7 +53,7 @@ export default async function StudentCourseList() {
       {/* Featured Course */}
       <div className="px-4 md:px-8 max-w-7xl mx-auto mb-12 md:mb-24">
         <Link
-          href="/student/lesson"
+          href={`/student/lesson/${featuredCourse.id}`}
           className="group relative rounded-3xl md:rounded-[3rem] overflow-hidden cursor-pointer bg-on-surface text-white flex flex-col md:flex-row min-h-[360px] md:min-h-[500px]"
         >
           <div className="absolute inset-0 md:relative md:w-1/2 h-full">
@@ -99,7 +99,7 @@ export default async function StudentCourseList() {
           {otherCourses.map((course) => (
             <Link
               key={course.id}
-              href="/student/lesson"
+              href={`/student/lesson/${course.id}`}
               className="group cursor-pointer flex flex-col"
             >
               <div className="aspect-[4/3] rounded-2xl md:rounded-3xl overflow-hidden mb-4 md:mb-6 relative">

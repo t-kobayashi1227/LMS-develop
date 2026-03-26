@@ -15,9 +15,13 @@ class LessonResource extends JsonResource
             'chapterId' => $this->chapter->uuid ?? '',
             'title' => $this->title,
             'duration' => $this->formattedDuration(),
+            'durationSeconds' => $this->duration_seconds,
             'isCompleted' => $this->is_completed ?? false,
             'isLocked' => $this->is_locked ?? false,
             'type' => $this->type,
+            'hasVideo' => $this->has_video,
+            'videoUrl' => $this->when($this->video_url, $this->video_url),
+            'contentBody' => $this->when($this->content_body, $this->content_body),
         ];
     }
 }

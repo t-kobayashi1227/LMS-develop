@@ -25,9 +25,57 @@ export interface Lesson {
   chapterId: string;
   title: string;
   duration: string;
+  durationSeconds: number;
   isCompleted: boolean;
   isLocked: boolean;
   type: 'video' | 'text' | 'assignment';
+  hasVideo: boolean;
+  videoUrl?: string;
+  contentBody?: string;
+}
+
+export interface Chapter {
+  id: string;
+  title: string;
+  sortOrder: number;
+  lessons: Lesson[];
+}
+
+export interface CourseChapters {
+  courseId: string;
+  courseTitle: string;
+  totalLessons: number;
+  completedLessons: number;
+  chapters: Chapter[];
+}
+
+export interface QuizQuestion {
+  id: string;
+  type: 'choice' | 'text';
+  questionText: string;
+  options: string[] | null;
+  conditions: string[] | null;
+  sortOrder: number;
+}
+
+export interface LessonDetail {
+  id: string;
+  courseId: string;
+  courseTitle: string;
+  chapterId: string;
+  chapterTitle: string;
+  title: string;
+  type: 'video' | 'text' | 'assignment';
+  hasVideo: boolean;
+  videoUrl: string | null;
+  contentBody: string | null;
+  duration: string;
+  durationSeconds: number;
+  isCompleted: boolean;
+  isLocked: boolean;
+  sortOrder: number;
+  resources: { id: string; title: string; fileOriginalName: string; fileSizeBytes: number | null; mimeType: string | null }[];
+  quizQuestions: QuizQuestion[];
 }
 
 export interface Assignment {
