@@ -1,14 +1,27 @@
-node_modules/
-build/
-dist/
-coverage/
 .DS_Store
 *.log
-.env*
-!.env.example
 
-# next.js
-.next/
-out/
-*.tsbuildinfo
-next-env.d.ts
+# Frontend
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/build/
+frontend/dist/
+frontend/coverage/
+frontend/.env*
+!frontend/.env.example
+frontend/*.tsbuildinfo
+frontend/next-env.d.ts
+frontend/e2e/
+frontend/playwright.config.ts
+frontend/playwright-report/
+
+# Backend
+backend/vendor/
+backend/.env
+backend/storage/logs/*.log
+backend/storage/framework/cache/*
+backend/storage/framework/sessions/*
+backend/storage/framework/views/*
+backend/bootstrap/cache/*
+backend/database/database.sqlite

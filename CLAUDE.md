@@ -4,16 +4,31 @@ This file provides guidance to Claude Code when working with this repository.
 
 ## Project Overview
 
-Niigata AI Academy LMS — Next.js 15 App Router の学習管理システム。バックエンドは Laravel で実装予定。現在は `lib/mockData.ts` のダミーデータで動作。日本語UIに英語ヘッディングを混在させるエディトリアルデザイン。
+Niigata AI Academy LMS — モノレポ構成の学習管理システム。フロントエンドは Next.js 15 App Router、バックエンドは Laravel 13 + MySQL 8.0（Docker）。日本語UIに英語ヘッディングを混在させるエディトリアルデザイン。
+
+## Repository Structure
+
+```
+/frontend   → Next.js 15 フロントエンド
+/backend    → Laravel 13 バックエンド API
+/docs       → 設計ドキュメント（database-schema.md 等）
+```
 
 ## Commands
 
+### Frontend (frontend/)
 - `npm run dev` — 開発サーバー起動（ポート3000）
 - `npm run build` — 本番ビルド（型チェック含む）
 
-テストフレームワークは未設定。ESLint も未設定（Next.js 16 で `next lint` 廃止のため）。
+### Backend (backend/)
+- `docker compose up -d` — Docker 環境起動（MySQL + Laravel）
+- `docker compose exec app php artisan migrate` — マイグレーション実行
+- `docker compose exec app php artisan db:seed` — シーダー実行
+- `docker compose exec app php artisan test` — テスト実行
 
-## Architecture
+テストフレームワーク: バックエンドは PHPUnit。フロントエンドは未設定。ESLint も未設定（Next.js 16 で `next lint` 廃止のため）。
+
+## Frontend Architecture
 
 ### Routing (App Router + Route Groups)
 
@@ -62,7 +77,21 @@ ProgressBar.tsx     → プログレスバー（Server Component）
 
 ### Path Alias
 
-`@/*` → プロジェクトルート（例: `@/lib/types`, `@/components/KPICard`）
+`@/*` → フロントエンドルート（例: `@/lib/types`, `@/components/KPICard`）
+
+## Backend Architecture
+
+### API
+
+- RESTful JSON API（`/api/v1/` プレフィックス）
+- Laravel API Resource で DTO 変換（DB → フロントエンド型）
+- 認証: Laravel Sanctum
+
+### Database
+
+- MySQL 8.0（Docker コンテナ）
+- 設計書: `frontend/docs/database-schema.md`
+- 16テーブル構成（users, courses, chapters, lessons, enrollments 等）
 
 ## Conventions
 
@@ -70,4 +99,4 @@ ProgressBar.tsx     → プログレスバー（Server Component）
 - ナビ項目追加時は `lib/navigation.ts` を編集
 - アイコンのみのボタンには `aria-label` を付与
 - モバイルでタッチ不可の `hover:opacity` パターンは使わない（`opacity-100 lg:opacity-0 lg:group-hover:opacity-100` で対応）
-- 機能追加・データモデル変更時は `docs/database-schema.md` も必ず更新する（テーブル定義、ER図、クエリパターン、フロントエンド型対応表）
+- 機能追加・データモデル変更時は `frontend/docs/database-schema.md` も必ず更新する（テーブル定義、ER図、クエリパターン、フロントエンド型対応表）
