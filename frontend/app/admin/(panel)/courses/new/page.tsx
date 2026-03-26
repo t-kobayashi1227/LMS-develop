@@ -1,0 +1,96 @@
+'use client';
+
+import { useState } from 'react';
+import Link from 'next/link';
+import { ArrowLeft, Save } from 'lucide-react';
+
+export default function NewCoursePage() {
+  const [title, setTitle] = useState('');
+  const [description, setDescription] = useState('');
+  const [saving, setSaving] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleCreate = async () => {
+    if (!title.trim()) {
+      setError('タイトルを入力してください');
+      return;
+    }
+    setSaving(true);
+    setError('');
+
+    const res = await fetch('/api/admin/courses', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({
+        title,
+        description: description || null,
+        categoryId: 1,
+        status: 'draft',
+      }),
+    });
+
+    if (!res.ok) {
+      setError('作成に失敗しました');
+      setSaving(false);
+      return;
+    }
+
+    const data = await res.json();
+    window.location.href = `/admin/courses/${data.data.id}`;
+  };
+
+  return (
+    <div className="animate-in fade-in duration-500 pb-24">
+      <div className="px-4 md:px-8 pt-6 md:pt-10 pb-6 max-w-3xl mx-auto">
+        <Link href="/admin/courses" className="inline-flex items-center gap-2 text-sm text-secondary hover:text-on-surface transition-colors mb-6">
+          <ArrowLeft size={16} /> コース管理に戻る
+        </Link>
+
+        <h2 className="text-3xl md:text-4xl font-serif font-bold text-on-surface tracking-tight mb-8">
+          新規コース作成
+        </h2>
+
+        {error && (
+          <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-red-600 text-sm mb-6">
+            {error}
+          </div>
+        )}
+
+        <div className="bg-white rounded-2xl border border-outline-variant/20 p-6 md:p-8 space-y-6">
+          <div>
+            <label className="block text-xs font-bold text-secondary uppercase tracking-widest mb-2">コースタイトル</label>
+            <input
+              type="text"
+              value={title}
+              onChange={e => setTitle(e.target.value)}
+              className="w-full px-4 py-3 bg-surface-low border border-outline-variant/30 rounded-xl text-sm outline-none focus:border-primary transition-colors"
+              placeholder="例: AI時代のデジタル・エディトリアル戦略"
+            />
+          </div>
+
+          <div>
+            <label className="block text-xs font-bold text-secondary uppercase tracking-widest mb-2">説明</label>
+            <textarea
+              value={description}
+              onChange={e => setDescription(e.target.value)}
+              rows={3}
+              className="w-full px-4 py-3 bg-surface-low border border-outline-variant/30 rounded-xl text-sm outline-none focus:border-primary transition-colors resize-none"
+              placeholder="コースの概要を入力..."
+            />
+          </div>
+
+          <div className="flex justify-end">
+            <button
+              onClick={handleCreate}
+              disabled={saving}
+              className="flex items-center gap-2 px-8 py-3 bg-primary text-white rounded-xl font-bold hover:bg-primary/90 transition-colors disabled:opacity-50"
+            >
+              <Save size={16} />
+              {saving ? '作成中...' : '作成して編集する'}
+            </button>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}

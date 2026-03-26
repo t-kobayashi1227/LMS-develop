@@ -177,7 +177,10 @@ export default function LessonView({ courseData, initialLessonId, initialLessonD
 
             {/* 理解度チェック CTA — DB にクイズ問題がある場合のみ表示 */}
             {hasQuiz && (
-              <div className="flex items-center justify-between p-5 md:p-8 bg-white rounded-3xl shadow-[0_10px_40px_rgba(0,0,0,0.04)] border border-outline-variant/10 group hover:border-primary/30 transition-colors cursor-pointer mb-8">
+              <Link
+                href={`/student/lesson/${courseData.courseId}/quiz?lessonId=${activeLessonId}`}
+                className="flex items-center justify-between p-5 md:p-8 bg-white rounded-3xl shadow-[0_10px_40px_rgba(0,0,0,0.04)] border border-outline-variant/10 group hover:border-primary/30 transition-colors cursor-pointer mb-8"
+              >
                 <div className="flex items-center gap-4">
                   <div className="w-12 h-12 rounded-full bg-tertiary/10 flex items-center justify-center text-tertiary group-hover:scale-110 transition-transform">
                     <Lightbulb size={24} />
@@ -194,7 +197,7 @@ export default function LessonView({ courseData, initialLessonId, initialLessonD
                 <div className="w-10 h-10 rounded-full border border-outline-variant/30 flex items-center justify-center text-on-surface group-hover:bg-primary group-hover:text-white group-hover:border-primary transition-all shrink-0">
                   <ArrowLeft size={18} className="rotate-180" />
                 </div>
-              </div>
+              </Link>
             )}
 
           </div>
