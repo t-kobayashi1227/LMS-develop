@@ -1,13 +1,20 @@
-'use client';
+import type { Metadata } from 'next';
+import Image from 'next/image';
+import { Users, BookOpen, CheckCircle, Clock, ArrowRight } from 'lucide-react';
+import { getCourses } from '@/lib/api';
+import KPICard from '@/components/KPICard';
+import ProgressBar from '@/components/ProgressBar';
 
-import { Users, BookOpen, CheckCircle, Clock, ArrowRight, MessageSquare } from 'lucide-react';
-import { mockCourses } from '@/lib/mockData';
+export const metadata: Metadata = {
+  title: 'ダッシュボード | 管理者 | Niigata AI Academy',
+};
 
 export default function AdminDashboard() {
-  return (
-    <div className="p-8 max-w-7xl mx-auto space-y-12 animate-in fade-in duration-500">
+  const courses = getCourses();
 
-      {/* Header */}
+  return (
+    <div className="p-4 md:p-8 max-w-7xl mx-auto space-y-8 md:space-y-12 animate-in fade-in duration-500">
+
       <div>
         <h2 className="text-3xl font-extrabold text-on-surface font-headline tracking-tight">
           ダッシュボード
@@ -15,79 +22,30 @@ export default function AdminDashboard() {
         <p className="text-secondary mt-2">全体のアクティビティと未対応のタスクを確認します。</p>
       </div>
 
-      {/* KPI Cards */}
-      <section className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-        <div className="bg-white p-6 rounded-3xl shadow-[0_4px_20px_rgba(0,64,161,0.04)] border border-outline-variant/10 flex flex-col justify-between h-40">
-          <div className="flex items-center justify-between">
-            <h3 className="text-sm font-bold text-secondary uppercase tracking-widest font-headline">アクティブ受講者</h3>
-            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-              <Users size={20} />
-            </div>
-          </div>
-          <div className="flex items-end gap-3">
-            <span className="text-4xl font-black text-on-surface font-headline">128</span>
-            <span className="text-primary font-bold text-sm mb-1">+12%</span>
-          </div>
-        </div>
-
-        <div className="bg-white p-6 rounded-3xl shadow-[0_4px_20px_rgba(0,64,161,0.04)] border border-outline-variant/10 flex flex-col justify-between h-40">
-          <div className="flex items-center justify-between">
-            <h3 className="text-sm font-bold text-secondary uppercase tracking-widest font-headline">公開コース数</h3>
-            <div className="w-10 h-10 rounded-full bg-tertiary/10 flex items-center justify-center text-tertiary">
-              <BookOpen size={20} />
-            </div>
-          </div>
-          <div className="flex items-end gap-3">
-            <span className="text-4xl font-black text-on-surface font-headline">14</span>
-          </div>
-        </div>
-
-        <div className="bg-white p-6 rounded-3xl shadow-[0_4px_20px_rgba(0,64,161,0.04)] border border-outline-variant/10 flex flex-col justify-between h-40">
-          <div className="flex items-center justify-between">
-            <h3 className="text-sm font-bold text-secondary uppercase tracking-widest font-headline">未採点の課題</h3>
-            <div className="w-10 h-10 rounded-full bg-[#ffcebd]/30 flex items-center justify-center text-tertiary">
-              <Clock size={20} />
-            </div>
-          </div>
-          <div className="flex items-end gap-3">
-            <span className="text-4xl font-black text-on-surface font-headline">24</span>
-            <span className="text-error font-bold text-sm mb-1">要対応</span>
-          </div>
-        </div>
-
-        <div className="bg-white p-6 rounded-3xl shadow-[0_4px_20px_rgba(0,64,161,0.04)] border border-outline-variant/10 flex flex-col justify-between h-40">
-          <div className="flex items-center justify-between">
-            <h3 className="text-sm font-bold text-secondary uppercase tracking-widest font-headline">平均修了率</h3>
-            <div className="w-10 h-10 rounded-full bg-primary/10 flex items-center justify-center text-primary">
-              <CheckCircle size={20} />
-            </div>
-          </div>
-          <div className="flex items-end gap-3">
-            <span className="text-4xl font-black text-on-surface font-headline">68%</span>
-            <span className="text-primary font-bold text-sm mb-1">+5%</span>
-          </div>
-        </div>
+      <section className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
+        <KPICard label="アクティブ受講者" value="128" icon={Users} iconColorClass="text-primary" iconBgClass="bg-primary/10" badge={{ text: '+12%', colorClass: 'text-primary' }} />
+        <KPICard label="公開コース数" value="14" icon={BookOpen} iconColorClass="text-tertiary" iconBgClass="bg-tertiary/10" />
+        <KPICard label="未採点の課題" value="24" icon={Clock} iconColorClass="text-tertiary" iconBgClass="bg-[#ffcebd]/30" badge={{ text: '要対応', colorClass: 'text-error' }} />
+        <KPICard label="平均修了率" value="68%" icon={CheckCircle} iconColorClass="text-primary" iconBgClass="bg-primary/10" badge={{ text: '+5%', colorClass: 'text-primary' }} />
       </section>
 
-      <section className="grid grid-cols-1 lg:grid-cols-2 gap-8">
-
-        {/* Pending Assignments */}
+      <section className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">
         <div className="bg-white rounded-3xl shadow-[0_10px_30px_rgba(0,0,0,0.02)] border border-outline-variant/10 overflow-hidden flex flex-col">
-          <div className="p-6 border-b border-outline-variant/10 flex items-center justify-between">
-            <h3 className="font-bold font-headline text-lg">提出された課題 (未採点)</h3>
+          <div className="p-4 md:p-6 border-b border-outline-variant/10 flex items-center justify-between">
+            <h3 className="font-bold font-headline text-base md:text-lg">提出された課題 (未採点)</h3>
             <button className="text-primary text-sm font-bold hover:underline">すべて見る</button>
           </div>
           <div className="divide-y divide-surface-container-low flex-1">
             {[1, 2, 3].map((i) => (
-              <div key={i} className="p-6 hover:bg-surface-container-low transition-colors flex items-center justify-between group cursor-pointer">
-                <div className="flex items-center gap-4">
-                  <img src={`https://placehold.co/150x150/e2e8f0/475569?text=Student`} alt="Student" className="w-10 h-10 rounded-full object-cover" />
+              <div key={i} className="p-4 md:p-6 hover:bg-surface-container-low transition-colors flex items-center justify-between group cursor-pointer">
+                <div className="flex items-center gap-3 md:gap-4">
+                  <Image src="https://placehold.co/150x150/e2e8f0/475569?text=Student" alt="Student" width={40} height={40} className="rounded-full object-cover" />
                   <div>
                     <p className="text-sm font-bold text-on-surface group-hover:text-primary transition-colors">ペルソナ設定プロンプトの作成</p>
                     <p className="text-xs text-secondary mt-1">佐藤 美咲 • 2時間前</p>
                   </div>
                 </div>
-                <button className="w-8 h-8 rounded-full bg-surface-container-high flex items-center justify-center text-secondary group-hover:bg-primary group-hover:text-white transition-colors">
+                <button className="w-8 h-8 rounded-full bg-surface-container-high flex items-center justify-center text-secondary group-hover:bg-primary group-hover:text-white transition-colors" aria-label="詳細を見る">
                   <ArrowRight size={16} />
                 </button>
               </div>
@@ -95,61 +53,21 @@ export default function AdminDashboard() {
           </div>
         </div>
 
-        {/* Recent Messages & Course Performance */}
-        <div className="space-y-8">
-
-          {/* Unread Messages */}
-          <div className="bg-white rounded-3xl shadow-[0_10px_30px_rgba(0,0,0,0.02)] border border-outline-variant/10 overflow-hidden">
-            <div className="p-6 border-b border-outline-variant/10 flex items-center justify-between">
-              <h3 className="font-bold font-headline text-lg flex items-center gap-2">
-                <MessageSquare size={20} className="text-tertiary" />
-                未読メッセージ
-              </h3>
-            </div>
-            <div className="p-6 space-y-4">
-              <div className="p-4 bg-surface-container-low rounded-xl cursor-pointer hover:bg-surface-container-high transition-colors">
-                <div className="flex items-center gap-3 mb-2">
-                  <img src="https://placehold.co/150x150/e2e8f0/475569?text=Student" alt="Student" className="w-6 h-6 rounded-full object-cover" />
-                  <span className="text-xs font-bold text-on-surface">田中 健太</span>
-                  <span className="text-[10px] text-secondary ml-auto">10:30</span>
-                </div>
-                <p className="text-sm font-medium text-on-surface-variant leading-relaxed line-clamp-2">
-                  第3章の課題について質問があります。JSONフォーマットでの出力指定がうまくいかず...
-                </p>
-              </div>
-              <div className="p-4 bg-surface-container-low rounded-xl cursor-pointer hover:bg-surface-container-high transition-colors">
-                <div className="flex items-center gap-3 mb-2">
-                  <img src="https://placehold.co/150x150/e2e8f0/475569?text=Student" alt="Student" className="w-6 h-6 rounded-full object-cover" />
-                  <span className="text-xs font-bold text-on-surface">鈴木 一郎</span>
-                  <span className="text-[10px] text-secondary ml-auto">昨日</span>
-                </div>
-                <p className="text-sm font-medium text-on-surface-variant leading-relaxed line-clamp-2">
-                  コース修了証の発行手順について教えていただけますでしょうか。
-                </p>
-              </div>
-            </div>
+        <div className="bg-white rounded-3xl shadow-[0_10px_30px_rgba(0,0,0,0.02)] border border-outline-variant/10 overflow-hidden">
+          <div className="p-4 md:p-6 border-b border-outline-variant/10">
+            <h3 className="font-bold font-headline text-base md:text-lg">コース別アクティビティ</h3>
           </div>
-
-          {/* Popular Courses */}
-          <div className="bg-white rounded-3xl shadow-[0_10px_30px_rgba(0,0,0,0.02)] border border-outline-variant/10 overflow-hidden">
-            <div className="p-6 border-b border-outline-variant/10">
-              <h3 className="font-bold font-headline text-lg">コース別アクティビティ</h3>
-            </div>
-            <div className="p-6 space-y-5">
-              {mockCourses.slice(0, 2).map((course, idx) => (
-                <div key={course.id}>
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="text-sm font-bold text-on-surface truncate pr-4">{course.title}</span>
-                    <span className="text-xs font-bold text-secondary shrink-0">{85 - idx * 20} 名受講中</span>
-                  </div>
-                  <div className="h-2 w-full bg-surface-container-high rounded-full overflow-hidden">
-                    <div className="h-full bg-primary rounded-full" style={{ width: `${85 - idx * 20}%` }}></div>
-                  </div>
+          <div className="p-4 md:p-6 space-y-5">
+            {courses.map((course) => (
+              <div key={course.id}>
+                <div className="flex justify-between items-center mb-2">
+                  <span className="text-sm font-bold text-on-surface truncate pr-4">{course.title}</span>
+                  <span className="text-xs font-bold text-secondary shrink-0">{course.studentCount} 名受講中</span>
                 </div>
-              ))}
-            </div>
+                <ProgressBar value={(course.studentCount / 100) * 100} />
+              </div>
+            ))}
           </div>
-
         </div>
       </section>
     </div>
