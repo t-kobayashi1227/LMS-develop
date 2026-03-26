@@ -1,54 +1,15 @@
-/**
- * Data service abstraction layer.
- * Currently returns mock data. When Laravel backend is ready,
- * replace implementations with actual API calls.
- */
+import { fetchData } from './apiClient';
+import type {
+  Course, Student, Assignment, User,
+  MonthlyData, CoursePerformance, RecentActivity, KpiData,
+} from './types';
 
-import {
-  mockCourses,
-  mockStudents,
-  mockAssignments,
-  currentUser,
-  adminUser,
-  monthlyStudentData,
-  coursePerformanceData,
-  recentActivityData,
-  courseCategories,
-} from './mockData';
-import type { Course, Student, Assignment, User, MonthlyData, CoursePerformance, RecentActivity } from './types';
-
-export function getCourses(): Course[] {
-  return mockCourses;
-}
-
-export function getStudents(): Student[] {
-  return mockStudents;
-}
-
-export function getAssignments(): Assignment[] {
-  return mockAssignments;
-}
-
-export function getCurrentUser(): User {
-  return currentUser;
-}
-
-export function getAdminUser(): User {
-  return adminUser;
-}
-
-export function getMonthlyStudentData(): MonthlyData[] {
-  return monthlyStudentData;
-}
-
-export function getCoursePerformanceData(): CoursePerformance[] {
-  return coursePerformanceData;
-}
-
-export function getRecentActivityData(): RecentActivity[] {
-  return recentActivityData;
-}
-
-export function getCourseCategories(): readonly string[] {
-  return courseCategories;
-}
+export const getCourses = () => fetchData<Course[]>('/courses');
+export const getStudents = () => fetchData<Student[]>('/students');
+export const getAssignments = () => fetchData<Assignment[]>('/assignments');
+export const getCurrentUser = () => fetchData<User>('/user');
+export const getMonthlyStudentData = () => fetchData<MonthlyData[]>('/analytics/monthly-students');
+export const getCoursePerformanceData = () => fetchData<CoursePerformance[]>('/analytics/course-performance');
+export const getRecentActivityData = () => fetchData<RecentActivity[]>('/analytics/recent-activity');
+export const getAdminKpi = () => fetchData<KpiData>('/analytics/kpi');
+export const getCourseCategories = () => fetchData<string[]>('/course-categories', { noAuth: true });

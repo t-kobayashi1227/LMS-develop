@@ -22,9 +22,13 @@ export default function DashboardLayout({ children, user }: DashboardLayoutProps
 
   const navItems = isStudent ? studentNav : adminNav;
 
-  const handleLogout = () => {
+  const handleLogout = async () => {
     setAvatarMenuOpen(false);
-    router.push(isStudent ? '/' : '/admin');
+    try {
+      await fetch('/api/auth/logout', { method: 'POST' });
+    } finally {
+      router.push(isStudent ? '/' : '/admin');
+    }
   };
 
   useEffect(() => {

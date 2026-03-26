@@ -80,3 +80,11 @@ export interface RecentActivity {
   time: string;
   type: ActivityType;
 }
+
+export interface KpiData {
+  activeStudents: number;
+  publishedCourses: number;
+  pendingSubmissions: number;
+  avgCompletion: number;
+  totalHours: number;
+}

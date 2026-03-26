@@ -1,10 +1,11 @@
 import DashboardLayout from '@/components/DashboardLayout';
-import { adminUser } from '@/lib/mockData';
+import { getCurrentUser } from '@/lib/api';
 
-export default function AdminPanelLayout({
+export default async function AdminPanelLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return <DashboardLayout user={adminUser}>{children}</DashboardLayout>;
+  const user = await getCurrentUser();
+  return <DashboardLayout user={user}>{children}</DashboardLayout>;
 }

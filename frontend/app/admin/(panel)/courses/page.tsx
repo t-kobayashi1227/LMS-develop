@@ -7,8 +7,8 @@ export const metadata: Metadata = {
   title: 'コース管理 | 管理者 | Niigata AI Academy',
 };
 
-export default function AdminCourseList() {
-  const courses = getCourses();
+export default async function AdminCourseList() {
+  const courses = await getCourses();
 
   return (
     <div className="animate-in fade-in duration-500 pb-24 overflow-x-hidden">

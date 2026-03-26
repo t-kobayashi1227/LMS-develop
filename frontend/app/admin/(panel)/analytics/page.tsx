@@ -1,6 +1,6 @@
 import type { Metadata } from 'next';
 import { TrendingUp, Users, Clock, Award, ArrowUpRight, ArrowDownRight } from 'lucide-react';
-import { getMonthlyStudentData, getCoursePerformanceData, getRecentActivityData } from '@/lib/api';
+import { getMonthlyStudentData, getCoursePerformanceData, getRecentActivityData, getAdminKpi } from '@/lib/api';
 import KPICard from '@/components/KPICard';
 import ProgressBar from '@/components/ProgressBar';
 import type { ActivityType } from '@/lib/types';
@@ -18,10 +18,13 @@ const activityDotColor: Record<ActivityType, string> = {
   warning: 'bg-amber-500',
 };
 
-export default function AdminAnalytics() {
-  const monthlyData = getMonthlyStudentData();
-  const coursePerformance = getCoursePerformanceData();
-  const recentActivity = getRecentActivityData();
+export default async function AdminAnalytics() {
+  const [monthlyData, coursePerformance, recentActivity, kpi] = await Promise.all([
+    getMonthlyStudentData(),
+    getCoursePerformanceData(),
+    getRecentActivityData(),
+    getAdminKpi(),
+  ]);
   const maxStudents = monthlyData.reduce((max, d) => Math.max(max, d.students), 0);
 
   return (
@@ -49,10 +52,10 @@ export default function AdminAnalytics() {
 
       <div className="px-4 md:px-8 max-w-7xl mx-auto mb-8 md:mb-12">
         <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-          <KPICard label="総受講者数" value="128" icon={Users} iconColorClass="text-primary" iconBgClass="bg-primary/10" badge={{ text: '+16%', colorClass: 'text-green-600' }} />
-          <KPICard label="アクティブ率" value="76%" icon={TrendingUp} iconColorClass="text-tertiary" iconBgClass="bg-tertiary/10" badge={{ text: '+8%', colorClass: 'text-green-600' }} />
-          <KPICard label="平均修了率" value="68%" icon={Award} iconColorClass="text-primary" iconBgClass="bg-primary/10" badge={{ text: '+5%', colorClass: 'text-green-600' }} />
-          <KPICard label="総学習時間" value="1,240h" icon={Clock} iconColorClass="text-tertiary" iconBgClass="bg-[#ffcebd]/30" badge={{ text: '-3%', colorClass: 'text-red-500' }} />
+          <KPICard label="アクティブ受講者" value={String(kpi.activeStudents)} icon={Users} iconColorClass="text-primary" iconBgClass="bg-primary/10" />
+          <KPICard label="公開コース数" value={String(kpi.publishedCourses)} icon={TrendingUp} iconColorClass="text-tertiary" iconBgClass="bg-tertiary/10" />
+          <KPICard label="平均修了率" value={`${kpi.avgCompletion}%`} icon={Award} iconColorClass="text-primary" iconBgClass="bg-primary/10" />
+          <KPICard label="総学習時間" value={`${kpi.totalHours}h`} icon={Clock} iconColorClass="text-tertiary" iconBgClass="bg-[#ffcebd]/30" />
         </div>
       </div>
 

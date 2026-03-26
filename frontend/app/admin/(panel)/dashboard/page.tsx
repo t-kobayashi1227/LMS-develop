@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import { Users, BookOpen, CheckCircle, Clock, ArrowRight } from 'lucide-react';
-import { getCourses } from '@/lib/api';
+import { getCourses, getAdminKpi } from '@/lib/api';
 import KPICard from '@/components/KPICard';
 import ProgressBar from '@/components/ProgressBar';
 
@@ -9,8 +9,8 @@ export const metadata: Metadata = {
   title: 'ダッシュボード | 管理者 | Niigata AI Academy',
 };
 
-export default function AdminDashboard() {
-  const courses = getCourses();
+export default async function AdminDashboard() {
+  const [courses, kpi] = await Promise.all([getCourses(), getAdminKpi()]);
 
   return (
     <div className="p-4 md:p-8 max-w-7xl mx-auto space-y-8 md:space-y-12 animate-in fade-in duration-500">
@@ -23,10 +23,10 @@ export default function AdminDashboard() {
       </div>
 
       <section className="grid grid-cols-2 md:grid-cols-2 lg:grid-cols-4 gap-4 md:gap-6">
-        <KPICard label="アクティブ受講者" value="128" icon={Users} iconColorClass="text-primary" iconBgClass="bg-primary/10" badge={{ text: '+12%', colorClass: 'text-primary' }} />
-        <KPICard label="公開コース数" value="14" icon={BookOpen} iconColorClass="text-tertiary" iconBgClass="bg-tertiary/10" />
-        <KPICard label="未採点の課題" value="24" icon={Clock} iconColorClass="text-tertiary" iconBgClass="bg-[#ffcebd]/30" badge={{ text: '要対応', colorClass: 'text-error' }} />
-        <KPICard label="平均修了率" value="68%" icon={CheckCircle} iconColorClass="text-primary" iconBgClass="bg-primary/10" badge={{ text: '+5%', colorClass: 'text-primary' }} />
+        <KPICard label="アクティブ受講者" value={String(kpi.activeStudents)} icon={Users} iconColorClass="text-primary" iconBgClass="bg-primary/10" />
+        <KPICard label="公開コース数" value={String(kpi.publishedCourses)} icon={BookOpen} iconColorClass="text-tertiary" iconBgClass="bg-tertiary/10" />
+        <KPICard label="未採点の課題" value={String(kpi.pendingSubmissions)} icon={Clock} iconColorClass="text-tertiary" iconBgClass="bg-[#ffcebd]/30" badge={kpi.pendingSubmissions > 0 ? { text: '要対応', colorClass: 'text-error' } : undefined} />
+        <KPICard label="平均修了率" value={`${kpi.avgCompletion}%`} icon={CheckCircle} iconColorClass="text-primary" iconBgClass="bg-primary/10" />
       </section>
 
       <section className="grid grid-cols-1 lg:grid-cols-2 gap-6 md:gap-8">

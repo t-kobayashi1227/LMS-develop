@@ -6,8 +6,8 @@ export const metadata: Metadata = {
   title: '設定 | Niigata AI Academy',
 };
 
-export default function StudentSettings() {
-  const user = getCurrentUser();
+export default async function StudentSettings() {
+  const user = await getCurrentUser();
 
   return (
     <div className="animate-in fade-in duration-500 pb-24">

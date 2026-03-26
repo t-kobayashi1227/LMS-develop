@@ -1,13 +1,13 @@
 import type { Metadata } from 'next';
 import Image from 'next/image';
-import { getAdminUser } from '@/lib/api';
+import { getCurrentUser } from '@/lib/api';
 
 export const metadata: Metadata = {
   title: '設定 | 管理者 | Niigata AI Academy',
 };
 
-export default function AdminSettings() {
-  const user = getAdminUser();
+export default async function AdminSettings() {
+  const user = await getCurrentUser();
 
   return (
     <div className="animate-in fade-in duration-500 pb-24">

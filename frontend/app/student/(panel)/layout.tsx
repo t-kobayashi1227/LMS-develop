@@ -1,10 +1,11 @@
 import DashboardLayout from '@/components/DashboardLayout';
-import { currentUser } from '@/lib/mockData';
+import { getCurrentUser } from '@/lib/api';
 
-export default function StudentPanelLayout({
+export default async function StudentPanelLayout({
   children,
 }: {
   children: React.ReactNode;
 }) {
-  return <DashboardLayout user={currentUser}>{children}</DashboardLayout>;
+  const user = await getCurrentUser();
+  return <DashboardLayout user={user}>{children}</DashboardLayout>;
 }

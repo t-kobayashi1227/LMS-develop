@@ -9,9 +9,8 @@ export const metadata: Metadata = {
   title: 'マイコース | Niigata AI Academy',
 };
 
-export default function StudentCourseList() {
-  const courses = getCourses();
-  const categories = getCourseCategories();
+export default async function StudentCourseList() {
+  const [courses, categories] = await Promise.all([getCourses(), getCourseCategories()]);
   const featuredCourse = courses[0];
   const otherCourses = courses.slice(1);
 
