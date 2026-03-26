@@ -16,6 +16,7 @@ export interface Course {
   totalLessons: number;
   completedLessons: number;
   category: string;
+  studentCount: number;
 }
 
 export interface Lesson {
@@ -46,4 +47,36 @@ export interface Message {
   timestamp: string;
   isUnread: boolean;
   type: 'direct' | 'feedback' | 'system';
+}
+
+export interface Student {
+  id: string;
+  name: string;
+  email: string;
+  avatar: string;
+  enrolledCourses: number;
+  progress: number;
+  lastActive: string;
+  status: 'active' | 'inactive';
+}
+
+export type ActivityType = 'complete' | 'submit' | 'enroll' | 'warning';
+
+export interface MonthlyData {
+  month: string;
+  students: number;
+}
+
+export interface CoursePerformance {
+  name: string;
+  students: number;
+  avgProgress: number;
+  completionRate: number;
+  satisfaction: number;
+}
+
+export interface RecentActivity {
+  action: string;
+  time: string;
+  type: ActivityType;
 }

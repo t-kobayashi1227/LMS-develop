@@ -14,6 +14,13 @@
   --color-on-surface: #191c1d;
   --color-on-surface-variant: #424654;
   --color-outline-variant: #c3c6d6;
+  --color-secondary: #6b7280;
+  --color-on-primary: #ffffff;
+  --color-error: #dc2626;
+  --color-surface: #f8f9fa;
+  --color-surface-container-low: #f2f4f5;
+  --color-surface-container-high: #e6e8e9;
+  --color-outline: #9ca3af;
 
   --font-headline: var(--font-plus-jakarta-sans), var(--font-noto-sans-jp), sans-serif;
   --font-body: var(--font-inter), var(--font-noto-sans-jp), sans-serif;

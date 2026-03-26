@@ -1,6 +1,7 @@
 'use client';
 
 import { useRouter } from 'next/navigation';
+import Image from 'next/image';
 
 interface LoginFormProps {
   isAdmin?: boolean;
@@ -26,7 +27,7 @@ export default function LoginForm({ isAdmin = false }: LoginFormProps) {
           {/* Header */}
           <div className="text-center mb-8">
             <div className="inline-flex items-center justify-center w-24 h-24 mb-6 rounded-2xl overflow-hidden bg-surface-container-low shadow-sm">
-              <img src="/logo.png" alt="Niigata AI Academy" className="w-full h-full object-cover aspect-square" onError={(e) => { e.currentTarget.src = 'https://placehold.co/400x400/e2e8f0/475569?text=NAA'; }} />
+              <Image src="/logo.png" alt="Niigata AI Academy" width={96} height={96} className="object-cover" />
             </div>
             <h1 className="text-3xl font-extrabold font-headline tracking-tight text-on-surface mb-2">
               {isAdmin ? '管理者ログイン' : 'Niigata AI Academy'}
