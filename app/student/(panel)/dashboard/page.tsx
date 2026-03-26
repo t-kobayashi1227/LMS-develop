@@ -1,17 +1,23 @@
-'use client';
-
+import type { Metadata } from 'next';
 import Link from 'next/link';
+import Image from 'next/image';
 import { PlayCircle, ArrowRight } from 'lucide-react';
-import { mockCourses } from '@/lib/mockData';
+import { getCourses } from '@/lib/api';
+import ProgressBar from '@/components/ProgressBar';
+
+export const metadata: Metadata = {
+  title: 'ホーム | Niigata AI Academy',
+};
 
 export default function StudentDashboard() {
+  const courses = getCourses();
+
   return (
     <div className="animate-in fade-in duration-500">
 
-      {/* Hero / Next Lesson - Full Bleed on Mobile */}
+      {/* Hero / Next Lesson */}
       <section className="md:px-8 pt-0 md:pt-12 pb-10 md:pb-12">
         <div className="relative px-6 py-12 md:p-16 bg-on-surface text-white md:rounded-[2.5rem] overflow-hidden flex flex-col justify-center min-h-[360px] md:min-h-[400px]">
-          {/* Abstract background element */}
           <div className="absolute top-0 right-0 w-full h-full opacity-20 pointer-events-none">
             <div className="absolute -right-20 -top-20 w-96 h-96 rounded-full border-[1px] border-white/20"></div>
             <div className="absolute right-10 top-10 w-64 h-64 rounded-full border-[1px] border-white/10"></div>
@@ -55,25 +61,24 @@ export default function StudentDashboard() {
         </div>
 
         <div className="flex flex-col">
-          {mockCourses.slice(0, 3).map((course, index) => (
+          {courses.slice(0, 3).map((course, index) => (
             <Link
               key={course.id}
               href="/student/lesson"
               className="group flex flex-col md:flex-row items-start md:items-center gap-5 md:gap-12 py-6 md:py-8 hairline-t cursor-pointer"
             >
-              {/* Large Editorial Number (Desktop) */}
               <div className="hidden md:block text-5xl font-serif font-light text-outline-variant/50 group-hover:text-primary transition-colors w-16">
                 0{index + 1}
               </div>
 
-              {/* Mobile Layout Wrapper */}
               <div className="flex gap-4 md:gap-12 w-full items-center md:items-stretch">
-                {/* Image */}
                 <div className="w-28 h-28 md:w-64 md:h-auto md:aspect-video rounded-xl md:rounded-2xl overflow-hidden relative shrink-0">
-                  <img
+                  <Image
                     src={course.thumbnail}
                     alt={course.title}
-                    className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                    fill
+                    className="object-cover group-hover:scale-105 transition-transform duration-700"
+                    sizes="(max-width: 768px) 112px, 256px"
                   />
                   <div className="absolute inset-0 bg-black/10 group-hover:bg-transparent transition-colors"></div>
                   <div className="md:hidden absolute top-2 left-2 bg-white/90 backdrop-blur-sm px-2 py-0.5 rounded-full text-[9px] font-bold tracking-widest uppercase">
@@ -81,7 +86,6 @@ export default function StudentDashboard() {
                   </div>
                 </div>
 
-                {/* Content */}
                 <div className="flex-1 space-y-2 md:space-y-4 py-1 md:py-0">
                   <div className="flex items-center gap-2">
                     <span className="text-[9px] md:text-[10px] font-bold tracking-widest uppercase text-secondary border border-outline-variant/30 px-2 py-0.5 md:py-1 rounded-md">
@@ -98,15 +102,12 @@ export default function StudentDashboard() {
                         <span className="text-on-surface">{course.progress}%</span>
                         <span className="text-secondary hidden md:inline">{course.completedLessons}/{course.totalLessons}</span>
                       </div>
-                      <div className="h-1 w-full bg-surface-container-high rounded-full overflow-hidden">
-                        <div className="h-full bg-on-surface rounded-full transition-all duration-1000" style={{ width: `${course.progress}%` }}></div>
-                      </div>
+                      <ProgressBar value={course.progress} height="h-1" barClass="bg-on-surface" />
                     </div>
                   </div>
                 </div>
               </div>
 
-              {/* Arrow (Desktop) */}
               <div className="hidden md:flex w-12 h-12 rounded-full border border-outline-variant/30 items-center justify-center text-on-surface group-hover:bg-on-surface group-hover:text-white transition-all shrink-0">
                 <ArrowRight size={20} className="-rotate-45 group-hover:rotate-0 transition-transform duration-300" />
               </div>
