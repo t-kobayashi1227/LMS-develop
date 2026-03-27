@@ -7,6 +7,11 @@ return new class extends Migration
 {
     public function up(): void
     {
+        // コメントは MySQL 固有機能のため、MySQL 以外ではスキップ
+        if (DB::getDriverName() !== 'mysql') {
+            return;
+        }
+
         // ── テーブルコメント ──────────────────────────────────
         $tables = [
             'users' => 'ユーザー（受講者・管理者）',
