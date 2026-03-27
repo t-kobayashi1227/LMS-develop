@@ -14,10 +14,12 @@ export default function SettingsForm({ user, roleLabel }: Props) {
   const [email, setEmail] = useState('');
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');
+  const [isError, setIsError] = useState(false);
 
   const handleSave = async () => {
     setSaving(true);
     setMessage('');
+    setIsError(false);
 
     try {
       const body: Record<string, string> = {};
@@ -39,11 +41,13 @@ export default function SettingsForm({ user, roleLabel }: Props) {
       if (!res.ok) {
         const err = await res.json().catch(() => ({}));
         setMessage(err.message || '保存に失敗しました');
+        setIsError(true);
       } else {
         setMessage('保存しました');
       }
     } catch {
       setMessage('サーバーに接続できません');
+      setIsError(true);
     } finally {
       setSaving(false);
       setTimeout(() => setMessage(''), 3000);
@@ -92,7 +96,7 @@ export default function SettingsForm({ user, roleLabel }: Props) {
 
       <div className="flex items-center justify-end gap-4">
         {message && (
-          <span className={`text-sm font-medium ${message.includes('失敗') || message.includes('接続') ? 'text-red-500' : 'text-green-600'}`}>
+          <span className={`text-sm font-medium ${isError ? 'text-red-500' : 'text-green-600'}`}>
             {message}
           </span>
         )}

@@ -68,7 +68,7 @@ export default async function StudentDashboard() {
           {courses.slice(0, 3).map((course, index) => (
             <Link
               key={course.id}
-              href={`/student/lesson/${courses[0]?.id ?? ''}`}
+              href={`/student/lesson/${course.id}`}
               className="group flex flex-col md:flex-row items-start md:items-center gap-5 md:gap-12 py-6 md:py-8 hairline-t cursor-pointer"
             >
               <div className="hidden md:block text-5xl font-serif font-light text-outline-variant/50 group-hover:text-primary transition-colors w-16">
