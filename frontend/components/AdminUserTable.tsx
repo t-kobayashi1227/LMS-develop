@@ -32,7 +32,8 @@ export default function AdminUserTable({ students }: AdminUserTableProps) {
       if (res.ok) {
         router.refresh();
       } else {
-        alert('削除に失敗しました');
+        const err = await res.json().catch(() => ({}));
+        alert(err.message || '削除に失敗しました');
       }
     } catch {
       alert('サーバーに接続できません');
