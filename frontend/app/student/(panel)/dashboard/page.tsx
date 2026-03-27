@@ -12,10 +12,14 @@ export const metadata: Metadata = {
 export default async function StudentDashboard() {
   const courses = await getCourses();
 
+  // 進行中のコース（進捗 > 0 で未完了）を優先、なければ最初のコース
+  const currentCourse = courses.find(c => c.progress > 0 && c.progress < 100) ?? courses[0];
+
   return (
     <div className="animate-in fade-in duration-500">
 
       {/* Hero / Next Lesson */}
+      {currentCourse && (
       <section className="md:px-8 pt-0 md:pt-12 pb-10 md:pb-12">
         <div className="relative px-6 py-12 md:p-16 bg-on-surface text-white md:rounded-[2.5rem] overflow-hidden flex flex-col justify-center min-h-[360px] md:min-h-[400px]">
           <div className="absolute top-0 right-0 w-full h-full opacity-20 pointer-events-none">
@@ -30,16 +34,15 @@ export default async function StudentDashboard() {
             </div>
 
             <h2 className="text-3xl md:text-5xl lg:text-6xl font-serif font-bold leading-[1.2] tracking-tight mb-4 text-balance">
-              プロンプトエンジニアリングの<br className="hidden md:block" />
-              <span className="italic font-light text-primary-container">基礎と応用</span>
+              {currentCourse.title}
             </h2>
 
             <p className="text-white/70 text-sm md:text-lg font-light leading-relaxed mb-8 max-w-lg">
-              LLMから高品質な出力を得るためのプロンプト設計の基本原則を学びます。
+              {currentCourse.description}
             </p>
 
             <Link
-              href={`/student/lesson/${courses[0]?.id ?? ''}`}
+              href={`/student/lesson/${currentCourse.id}`}
               className="group inline-flex items-center gap-4 bg-white text-on-surface px-6 md:px-8 py-3.5 md:py-4 rounded-full text-sm md:text-base font-bold hover:bg-primary-container hover:text-white transition-all active:scale-95 w-fit"
             >
               <PlayCircle size={20} className="group-hover:scale-110 transition-transform" />
@@ -48,6 +51,7 @@ export default async function StudentDashboard() {
           </div>
         </div>
       </section>
+      )}
 
       {/* Editorial List Section */}
       <section className="px-5 md:px-8 max-w-7xl mx-auto pb-32">

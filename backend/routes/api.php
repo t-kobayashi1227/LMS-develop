@@ -20,6 +20,7 @@ Route::prefix('v1')->group(function () {
     Route::middleware(['auth:sanctum', UpdateLastActive::class])->group(function () {
         Route::post('/logout', [AuthController::class, 'logout']);
         Route::get('/user', [AuthController::class, 'currentUser']);
+        Route::put('/user', [AuthController::class, 'updateProfile']);
 
         // Student / shared
         Route::get('/courses', [CourseController::class, 'index']);

@@ -57,4 +57,19 @@ class AuthController extends Controller
     {
         return new UserResource($request->user());
     }
+
+    public function updateProfile(Request $request): JsonResponse
+    {
+        $user = $request->user();
+        $validated = $request->validate([
+            'name' => 'sometimes|string|max:255',
+            'email' => 'sometimes|email|max:255|unique:users,email,' . $user->id,
+        ]);
+
+        if (array_key_exists('name', $validated)) $user->name = $validated['name'];
+        if (array_key_exists('email', $validated)) $user->email = $validated['email'];
+        $user->save();
+
+        return response()->json(['data' => new UserResource($user)]);
+    }
 }

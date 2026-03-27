@@ -81,10 +81,10 @@ export default function DashboardLayout({ children, user }: DashboardLayoutProps
 
         {!isStudent && (
           <div className="px-6 mt-4 mb-4">
-            <button className="w-full primary-gradient text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all">
+            <Link href="/admin/courses/new" className="w-full primary-gradient text-white py-3 rounded-xl font-bold flex items-center justify-center gap-2 shadow-lg shadow-primary/20 hover:scale-[1.02] active:scale-95 transition-all">
               <Plus size={18} />
               新規コース作成
-            </button>
+            </Link>
           </div>
         )}
 
