@@ -40,13 +40,6 @@ export default async function AdminAnalytics() {
               受講者の学習状況とコースパフォーマンスを分析します。
             </p>
           </div>
-          <div className="flex items-center gap-2 md:gap-3">
-            <select className="px-4 py-2.5 bg-surface-low border border-outline-variant/30 rounded-full text-sm font-medium text-on-surface outline-none" aria-label="期間選択">
-              <option>過去6ヶ月</option>
-              <option>過去3ヶ月</option>
-              <option>過去1年</option>
-            </select>
-          </div>
         </div>
       </div>
 

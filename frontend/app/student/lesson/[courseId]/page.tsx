@@ -1,4 +1,9 @@
+import type { Metadata } from 'next';
 import { getCourseChapters, getLesson } from '@/lib/api';
+
+export const metadata: Metadata = {
+  title: 'レッスン | Niigata AI Academy',
+};
 import LessonView from './LessonView';
 
 interface Props {

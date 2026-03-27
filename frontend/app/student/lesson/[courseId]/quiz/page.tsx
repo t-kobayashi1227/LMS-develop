@@ -1,5 +1,10 @@
+import type { Metadata } from 'next';
 import { redirect } from 'next/navigation';
 import { getLesson } from '@/lib/api';
+
+export const metadata: Metadata = {
+  title: '理解度チェック | Niigata AI Academy',
+};
 import QuizView from './QuizView';
 
 interface Props {

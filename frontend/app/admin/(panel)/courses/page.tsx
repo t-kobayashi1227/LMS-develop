@@ -92,10 +92,10 @@ export default async function AdminCourseList() {
               全 {courses.length} 件中 1 - {courses.length} 件を表示
             </div>
             <div className="flex items-center gap-2">
-              <button className="p-2 rounded-full border border-outline-variant/30 text-secondary hover:text-on-surface hover:bg-surface-container-low transition-colors disabled:opacity-50" aria-label="前のページ">
+              <button disabled className="p-2 rounded-full border border-outline-variant/30 text-secondary transition-colors disabled:opacity-50" aria-label="前のページ">
                 <ChevronLeft size={16} />
               </button>
-              <button className="p-2 rounded-full border border-outline-variant/30 text-secondary hover:text-on-surface hover:bg-surface-container-low transition-colors disabled:opacity-50" aria-label="次のページ">
+              <button disabled className="p-2 rounded-full border border-outline-variant/30 text-secondary transition-colors disabled:opacity-50" aria-label="次のページ">
                 <ChevronRight size={16} />
               </button>
             </div>
