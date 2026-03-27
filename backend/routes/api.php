@@ -13,6 +13,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
     // Public
+    Route::get('/health', fn () => response()->json(['status' => 'ok', 'timestamp' => now()->toIso8601String()]));
     Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:5,1');
     Route::get('/course-categories', [CourseController::class, 'categories']);
 
