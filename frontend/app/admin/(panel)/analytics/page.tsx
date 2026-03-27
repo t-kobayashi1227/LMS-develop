@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { TrendingUp, Users, Clock, Award, ArrowUpRight, ArrowDownRight } from 'lucide-react';
+import { TrendingUp, Users, Clock, Award } from 'lucide-react';
 import { getMonthlyStudentData, getCoursePerformanceData, getRecentActivityData, getAdminKpi } from '@/lib/api';
 import KPICard from '@/components/KPICard';
 import ProgressBar from '@/components/ProgressBar';

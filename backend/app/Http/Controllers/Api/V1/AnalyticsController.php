@@ -8,6 +8,7 @@ use App\Models\ActivityLog;
 use App\Models\AssignmentSubmission;
 use App\Models\Course;
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\DB;
 
@@ -124,6 +125,24 @@ class AnalyticsController extends Controller
             ->get();
 
         return ['data' => $courseStats];
+    }
+
+    public function pendingSubmissions(): JsonResponse
+    {
+        $submissions = AssignmentSubmission::where('status', 'submitted')
+            ->with(['assignment', 'user'])
+            ->orderByDesc('submitted_at')
+            ->limit(10)
+            ->get()
+            ->map(fn ($s) => [
+                'id' => $s->uuid,
+                'assignmentTitle' => $s->assignment->title ?? '',
+                'studentName' => $s->user->name ?? '',
+                'studentAvatar' => $s->user->avatarUrl(),
+                'submittedAt' => $s->submitted_at->locale('ja')->diffForHumans(),
+            ]);
+
+        return response()->json(['data' => $submissions]);
     }
 
     public function recentActivity(): AnonymousResourceCollection

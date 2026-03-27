@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Api\V1;
 use App\Http\Controllers\Controller;
 use App\Http\Resources\StudentResource;
 use App\Models\User;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 use Illuminate\Support\Facades\DB;
 
@@ -44,5 +45,13 @@ class StudentController extends Controller
         });
 
         return StudentResource::collection($students);
+    }
+
+    public function destroy(string $uuid): JsonResponse
+    {
+        $user = User::where('uuid', $uuid)->where('role', 'student')->firstOrFail();
+        $user->delete();
+
+        return response()->json(['data' => ['status' => 'deleted']]);
     }
 }

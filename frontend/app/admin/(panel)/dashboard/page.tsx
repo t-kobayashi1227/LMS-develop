@@ -1,7 +1,7 @@
 import type { Metadata } from 'next';
 import Image from 'next/image';
 import { Users, BookOpen, CheckCircle, Clock, ArrowRight } from 'lucide-react';
-import { getCourses, getAdminKpi } from '@/lib/api';
+import { getCourses, getAdminKpi, getPendingSubmissions } from '@/lib/api';
 import KPICard from '@/components/KPICard';
 import ProgressBar from '@/components/ProgressBar';
 
@@ -10,7 +10,11 @@ export const metadata: Metadata = {
 };
 
 export default async function AdminDashboard() {
-  const [courses, kpi] = await Promise.all([getCourses(), getAdminKpi()]);
+  const [courses, kpi, submissions] = await Promise.all([
+    getCourses(),
+    getAdminKpi(),
+    getPendingSubmissions(),
+  ]);
 
   return (
     <div className="p-4 md:p-8 max-w-7xl mx-auto space-y-8 md:space-y-12 animate-in fade-in duration-500">
@@ -33,23 +37,26 @@ export default async function AdminDashboard() {
         <div className="bg-white rounded-3xl shadow-[0_10px_30px_rgba(0,0,0,0.02)] border border-outline-variant/10 overflow-hidden flex flex-col">
           <div className="p-4 md:p-6 border-b border-outline-variant/10 flex items-center justify-between">
             <h3 className="font-bold font-headline text-base md:text-lg">提出された課題 (未採点)</h3>
-            <button className="text-primary text-sm font-bold hover:underline">すべて見る</button>
           </div>
           <div className="divide-y divide-surface-container-low flex-1">
-            {[1, 2, 3].map((i) => (
-              <div key={i} className="p-4 md:p-6 hover:bg-surface-container-low transition-colors flex items-center justify-between group cursor-pointer">
-                <div className="flex items-center gap-3 md:gap-4">
-                  <Image src="https://placehold.co/150x150/e2e8f0/475569?text=Student" alt="Student" width={40} height={40} className="rounded-full object-cover" />
-                  <div>
-                    <p className="text-sm font-bold text-on-surface group-hover:text-primary transition-colors">ペルソナ設定プロンプトの作成</p>
-                    <p className="text-xs text-secondary mt-1">佐藤 美咲 • 2時間前</p>
+            {submissions.length === 0 ? (
+              <div className="p-6 text-center text-secondary text-sm">未採点の課題はありません</div>
+            ) : (
+              submissions.map((s) => (
+                <div key={s.id} className="p-4 md:p-6 hover:bg-surface-container-low transition-colors flex items-center justify-between group cursor-pointer">
+                  <div className="flex items-center gap-3 md:gap-4">
+                    <Image src={s.studentAvatar} alt={s.studentName} width={40} height={40} className="rounded-full object-cover" />
+                    <div>
+                      <p className="text-sm font-bold text-on-surface group-hover:text-primary transition-colors">{s.assignmentTitle}</p>
+                      <p className="text-xs text-secondary mt-1">{s.studentName} • {s.submittedAt}</p>
+                    </div>
+                  </div>
+                  <div className="w-8 h-8 rounded-full bg-surface-container-high flex items-center justify-center text-secondary group-hover:bg-primary group-hover:text-white transition-colors">
+                    <ArrowRight size={16} />
                   </div>
                 </div>
-                <button className="w-8 h-8 rounded-full bg-surface-container-high flex items-center justify-center text-secondary group-hover:bg-primary group-hover:text-white transition-colors" aria-label="詳細を見る">
-                  <ArrowRight size={16} />
-                </button>
-              </div>
-            ))}
+              ))
+            )}
           </div>
         </div>
 

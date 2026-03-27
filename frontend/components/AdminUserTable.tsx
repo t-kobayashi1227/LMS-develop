@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useCallback } from 'react';
 import Image from 'next/image';
-import { Search, Filter, Mail, Edit, Trash2, ChevronLeft, ChevronRight } from 'lucide-react';
+import { useRouter } from 'next/navigation';
+import { Search, Filter, Mail, Edit, Trash2, ChevronLeft, ChevronRight, Loader2 } from 'lucide-react';
 import ProgressBar from '@/components/ProgressBar';
 import type { Student } from '@/lib/types';
 
@@ -11,7 +12,9 @@ interface AdminUserTableProps {
 }
 
 export default function AdminUserTable({ students }: AdminUserTableProps) {
+  const router = useRouter();
   const [searchTerm, setSearchTerm] = useState('');
+  const [deletingId, setDeletingId] = useState<string | null>(null);
 
   const filteredStudents = useMemo(() => {
     const lower = searchTerm.toLowerCase();
@@ -20,6 +23,23 @@ export default function AdminUserTable({ students }: AdminUserTableProps) {
       student.email.toLowerCase().includes(lower)
     );
   }, [searchTerm, students]);
+
+  const handleDelete = useCallback(async (studentId: string, studentName: string) => {
+    if (!confirm(`${studentName} を削除しますか？`)) return;
+    setDeletingId(studentId);
+    try {
+      const res = await fetch(`/api/students/${studentId}`, { method: 'DELETE' });
+      if (res.ok) {
+        router.refresh();
+      } else {
+        alert('削除に失敗しました');
+      }
+    } catch {
+      alert('サーバーに接続できません');
+    } finally {
+      setDeletingId(null);
+    }
+  }, [router]);
 
   return (
     <div className="animate-in fade-in duration-500 pb-24 overflow-x-hidden">
@@ -112,8 +132,13 @@ export default function AdminUserTable({ students }: AdminUserTableProps) {
                         <button className="p-2 text-secondary hover:text-on-surface transition-colors rounded-full hover:bg-surface-container-high" aria-label="編集">
                           <Edit size={16} />
                         </button>
-                        <button className="p-2 text-secondary hover:text-red-500 transition-colors rounded-full hover:bg-surface-container-high" aria-label="削除">
-                          <Trash2 size={16} />
+                        <button
+                          onClick={() => handleDelete(student.id, student.name)}
+                          disabled={deletingId === student.id}
+                          className="p-2 text-secondary hover:text-red-500 transition-colors rounded-full hover:bg-surface-container-high disabled:opacity-50"
+                          aria-label="削除"
+                        >
+                          {deletingId === student.id ? <Loader2 size={16} className="animate-spin" /> : <Trash2 size={16} />}
                         </button>
                       </div>
                     </td>

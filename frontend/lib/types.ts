@@ -136,3 +136,11 @@ export interface KpiData {
   avgCompletion: number;
   totalHours: number;
 }
+
+export interface PendingSubmission {
+  id: string;
+  assignmentTitle: string;
+  studentName: string;
+  studentAvatar: string;
+  submittedAt: string;
+}

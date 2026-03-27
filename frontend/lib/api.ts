@@ -1,8 +1,8 @@
-import { apiFetch, fetchData } from './apiClient';
+import { fetchData } from './apiClient';
 import type {
   Course, Student, Assignment, User,
   MonthlyData, CoursePerformance, RecentActivity, KpiData,
-  CourseChapters, LessonDetail,
+  CourseChapters, LessonDetail, PendingSubmission,
 } from './types';
 
 export const getCourses = () => fetchData<Course[]>('/courses');
@@ -16,3 +16,4 @@ export const getAdminKpi = () => fetchData<KpiData>('/analytics/kpi');
 export const getCourseCategories = () => fetchData<string[]>('/course-categories', { noAuth: true });
 export const getCourseChapters = (courseId: string) => fetchData<CourseChapters>(`/courses/${courseId}/chapters`);
 export const getLesson = (lessonId: string) => fetchData<LessonDetail>(`/lessons/${lessonId}`);
+export const getPendingSubmissions = () => fetchData<PendingSubmission[]>('/analytics/pending-submissions');

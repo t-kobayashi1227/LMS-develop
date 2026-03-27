@@ -32,10 +32,12 @@ Route::prefix('v1')->group(function () {
         // Admin only
         Route::middleware(EnsureAdmin::class)->group(function () {
             Route::get('/students', [StudentController::class, 'index']);
+            Route::delete('/students/{uuid}', [StudentController::class, 'destroy']);
             Route::get('/analytics/kpi', [AnalyticsController::class, 'adminKpi']);
             Route::get('/analytics/monthly-students', [AnalyticsController::class, 'monthlyStudents']);
             Route::get('/analytics/course-performance', [AnalyticsController::class, 'coursePerformance']);
             Route::get('/analytics/recent-activity', [AnalyticsController::class, 'recentActivity']);
+            Route::get('/analytics/pending-submissions', [AnalyticsController::class, 'pendingSubmissions']);
 
             // Course CRUD
             Route::get('/admin/categories', [AdminCourseController::class, 'categoriesWithId']);
