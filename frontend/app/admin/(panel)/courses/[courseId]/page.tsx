@@ -1,11 +1,11 @@
 import type { Metadata } from 'next';
 import { fetchData } from '@/lib/apiClient';
 import { getCourseCategories } from '@/lib/api';
+import CourseEditor from './CourseEditor';
 
 export const metadata: Metadata = {
   title: 'コース編集 | 管理者 | Niigata AI Academy',
 };
-import CourseEditor from './CourseEditor';
 
 interface Props {
   params: Promise<{ courseId: string }>;
