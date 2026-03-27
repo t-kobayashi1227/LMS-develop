@@ -16,6 +16,14 @@ use Illuminate\Support\Str;
 
 class AdminCourseController extends Controller
 {
+    public function categoriesWithId(): JsonResponse
+    {
+        $categories = CourseCategory::orderBy('sort_order')
+            ->get(['id', 'name', 'slug']);
+
+        return response()->json(['data' => $categories]);
+    }
+
     public function index(): AnonymousResourceCollection
     {
         $courses = Course::with('category')

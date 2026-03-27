@@ -37,6 +37,7 @@ Route::prefix('v1')->group(function () {
             Route::get('/analytics/recent-activity', [AnalyticsController::class, 'recentActivity']);
 
             // Course CRUD
+            Route::get('/admin/categories', [AdminCourseController::class, 'categoriesWithId']);
             Route::get('/admin/courses', [AdminCourseController::class, 'index']);
             Route::post('/admin/courses', [AdminCourseController::class, 'store']);
             Route::get('/admin/courses/{uuid}', [AdminCourseController::class, 'show']);
