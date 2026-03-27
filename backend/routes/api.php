@@ -13,7 +13,7 @@ use Illuminate\Support\Facades\Route;
 
 Route::prefix('v1')->group(function () {
     // Public
-    Route::post('/login', [AuthController::class, 'login']);
+    Route::post('/login', [AuthController::class, 'login'])->middleware('throttle:5,1');
     Route::get('/course-categories', [CourseController::class, 'categories']);
 
     // Authenticated
@@ -21,6 +21,7 @@ Route::prefix('v1')->group(function () {
         Route::post('/logout', [AuthController::class, 'logout']);
         Route::get('/user', [AuthController::class, 'currentUser']);
         Route::put('/user', [AuthController::class, 'updateProfile']);
+        Route::put('/user/password', [AuthController::class, 'changePassword']);
 
         // Student / shared
         Route::get('/courses', [CourseController::class, 'index']);

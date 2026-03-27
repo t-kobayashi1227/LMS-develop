@@ -8,8 +8,8 @@ interface LoginFormProps {
 }
 
 export default function LoginForm({ isAdmin = false }: LoginFormProps) {
-  const [email, setEmail] = useState(isAdmin ? 'yui.sato@example.com' : 'kenta.tanaka@example.com');
-  const [password, setPassword] = useState('password');
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
 

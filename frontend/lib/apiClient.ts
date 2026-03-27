@@ -1,4 +1,5 @@
 import { cookies } from 'next/headers';
+import { redirect } from 'next/navigation';
 import { BACKEND_URL } from './config';
 
 export async function getToken(): Promise<string | undefined> {
@@ -28,6 +29,11 @@ export async function apiFetch<T>(
   });
 
   if (!res.ok) {
+    if (res.status === 401 && !options?.noAuth) {
+      const cookieStore = await cookies();
+      cookieStore.delete('auth_token');
+      redirect('/');
+    }
     const errorBody = await res.json().catch(() => ({}));
     throw new Error(errorBody.message || `API error: ${res.status}`);
   }

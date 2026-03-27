@@ -3,7 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Eye, BarChart2, Edit, Trash2, Loader2 } from 'lucide-react';
+import { Eye, Edit, Trash2, Loader2 } from 'lucide-react';
 
 interface Props {
   courseId: string;
@@ -35,9 +35,6 @@ export default function CourseRowActions({ courseId }: Props) {
       <Link href={`/student/lesson/${courseId}`} className="p-2 text-secondary hover:text-primary transition-colors rounded-full hover:bg-surface-container-high" aria-label="プレビュー">
         <Eye size={16} />
       </Link>
-      <button className="p-2 text-secondary hover:text-primary transition-colors rounded-full hover:bg-surface-container-high" aria-label="分析">
-        <BarChart2 size={16} />
-      </button>
       <Link href={`/admin/courses/${courseId}`} className="p-2 text-secondary hover:text-on-surface transition-colors rounded-full hover:bg-surface-container-high" aria-label="編集">
         <Edit size={16} />
       </Link>

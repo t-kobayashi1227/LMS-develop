@@ -12,15 +12,15 @@ services:
       db:
         condition: service_healthy
     environment:
-      - APP_ENV=local
-      - APP_DEBUG=true
+      - APP_ENV=${APP_ENV:-local}
+      - APP_DEBUG=${APP_DEBUG:-true}
       - APP_KEY=${APP_KEY}
       - DB_CONNECTION=mysql
       - DB_HOST=db
       - DB_PORT=3306
       - DB_DATABASE=lms
       - DB_USERNAME=lms_user
-      - DB_PASSWORD=lms_password
+      - DB_PASSWORD=${DB_PASSWORD:-lms_password}
     command: >
       sh -c "
         echo 'Waiting for MySQL...' &&
@@ -37,14 +37,14 @@ services:
     ports:
       - "3306:3306"
     environment:
-      MYSQL_ROOT_PASSWORD: root_password
+      MYSQL_ROOT_PASSWORD: ${MYSQL_ROOT_PASSWORD:-root_password}
       MYSQL_DATABASE: lms
       MYSQL_USER: lms_user
-      MYSQL_PASSWORD: lms_password
+      MYSQL_PASSWORD: ${DB_PASSWORD:-lms_password}
     volumes:
       - db_data:/var/lib/mysql
     healthcheck:
-      test: ["CMD", "mysqladmin", "ping", "-h", "localhost", "-u", "root", "-proot_password"]
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
       interval: 5s
       timeout: 5s
       retries: 10

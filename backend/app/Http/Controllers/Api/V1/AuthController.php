@@ -72,4 +72,25 @@ class AuthController extends Controller
 
         return response()->json(['data' => new UserResource($user)]);
     }
+
+    public function changePassword(Request $request): JsonResponse
+    {
+        $request->validate([
+            'currentPassword' => 'required|string',
+            'newPassword' => 'required|string|min:8|confirmed',
+        ]);
+
+        $user = $request->user();
+
+        if (!Hash::check($request->currentPassword, $user->password)) {
+            throw ValidationException::withMessages([
+                'currentPassword' => ['現在のパスワードが正しくありません。'],
+            ]);
+        }
+
+        $user->password = Hash::make($request->newPassword);
+        $user->save();
+
+        return response()->json(['message' => 'パスワードを変更しました。']);
+    }
 }
