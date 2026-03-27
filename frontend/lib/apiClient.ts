@@ -7,6 +7,11 @@ export async function getToken(): Promise<string | undefined> {
   return cookieStore.get('auth_token')?.value;
 }
 
+async function clearToken() {
+  const cookieStore = await cookies();
+  cookieStore.delete('auth_token');
+}
+
 export async function apiFetch<T>(
   path: string,
   options?: {
@@ -30,8 +35,7 @@ export async function apiFetch<T>(
 
   if (!res.ok) {
     if (res.status === 401 && !options?.noAuth) {
-      const cookieStore = await cookies();
-      cookieStore.delete('auth_token');
+      await clearToken();
       redirect('/');
     }
     const errorBody = await res.json().catch(() => ({}));
