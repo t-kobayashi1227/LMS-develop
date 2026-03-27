@@ -97,7 +97,7 @@ export default function LessonView({ courseData, initialLessonId, initialLessonD
                 key={lessonDetail.videoUrl!}
                 className="w-full h-full object-contain"
                 controls
-                poster="https://placehold.co/1200x675/1a1a2e/ffffff?text=▶"
+                poster="/video-poster.svg"
               >
                 <source src={lessonDetail.videoUrl!} />
               </video>
@@ -106,7 +106,7 @@ export default function LessonView({ courseData, initialLessonId, initialLessonD
             /* has_video フラグはあるが URL が未設定 → プレースホルダー */
             <div className="aspect-video w-full bg-black relative group shrink-0">
               <Image
-                src="https://placehold.co/1200x675/e2e8f0/475569?text=動画準備中"
+                src="/video-placeholder.svg"
                 alt="Video placeholder"
                 fill
                 className="object-cover opacity-50"
