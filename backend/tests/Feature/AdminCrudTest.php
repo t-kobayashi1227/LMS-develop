@@ -6,7 +6,6 @@ use App\Models\Chapter;
 use App\Models\Course;
 use App\Models\CourseCategory;
 use App\Models\Lesson;
-use App\Models\QuizQuestion;
 use App\Models\User;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Tests\TestCase;
@@ -27,30 +26,42 @@ class AdminCrudTest extends TestCase
         $this->category = CourseCategory::create(['name' => 'Test', 'slug' => 'test', 'sort_order' => 0]);
     }
 
+    private function createCourse(): Course
+    {
+        return Course::factory()->create(['course_category_id' => $this->category->id]);
+    }
+
+    private function createLesson(): array
+    {
+        $course = $this->createCourse();
+        $chapter = Chapter::factory()->create(['course_id' => $course->id]);
+        $lesson = Lesson::factory()->create(['chapter_id' => $chapter->id]);
+        return [$course, $chapter, $lesson];
+    }
+
     // ── Course CRUD ──────────────────────────────
 
     public function test_admin_can_create_course(): void
     {
-        $res = $this->actingAs($this->admin)
+        $this->actingAs($this->admin)
             ->postJson('/api/v1/admin/courses', [
                 'title' => 'New Course',
                 'categoryId' => $this->category->id,
-            ]);
-
-        $res->assertStatus(201)
+            ])
+            ->assertStatus(201)
             ->assertJsonPath('data.id', fn ($id) => is_string($id) && strlen($id) === 36);
     }
 
     public function test_student_cannot_create_course(): void
     {
         $this->actingAs($this->student)
-            ->postJson('/api/v1/admin/courses', ['title' => 'X', 'categoryId' => 1])
+            ->postJson('/api/v1/admin/courses', ['title' => 'X', 'categoryId' => $this->category->id])
             ->assertStatus(403);
     }
 
     public function test_admin_can_update_course(): void
     {
-        $course = Course::factory()->create(['course_category_id' => $this->category->id]);
+        $course = $this->createCourse();
 
         $this->actingAs($this->admin)
             ->putJson("/api/v1/admin/courses/{$course->uuid}", ['title' => 'Updated'])
@@ -62,7 +73,7 @@ class AdminCrudTest extends TestCase
 
     public function test_admin_can_delete_course(): void
     {
-        $course = Course::factory()->create(['course_category_id' => $this->category->id]);
+        $course = $this->createCourse();
 
         $this->actingAs($this->admin)
             ->deleteJson("/api/v1/admin/courses/{$course->uuid}")
@@ -75,20 +86,18 @@ class AdminCrudTest extends TestCase
 
     public function test_admin_can_add_chapter(): void
     {
-        $course = Course::factory()->create(['course_category_id' => $this->category->id]);
+        $course = $this->createCourse();
 
-        $res = $this->actingAs($this->admin)
-            ->postJson("/api/v1/admin/courses/{$course->uuid}/chapters", [
-                'title' => 'Chapter 1',
-            ]);
+        $this->actingAs($this->admin)
+            ->postJson("/api/v1/admin/courses/{$course->uuid}/chapters", ['title' => 'Chapter 1'])
+            ->assertStatus(201);
 
-        $res->assertStatus(201);
         $this->assertDatabaseHas('chapters', ['course_id' => $course->id, 'title' => 'Chapter 1']);
     }
 
     public function test_admin_can_delete_chapter(): void
     {
-        $course = Course::factory()->create(['course_category_id' => $this->category->id]);
+        $course = $this->createCourse();
         $chapter = Chapter::factory()->create(['course_id' => $course->id]);
 
         $this->actingAs($this->admin)
@@ -102,49 +111,45 @@ class AdminCrudTest extends TestCase
 
     public function test_admin_can_add_lesson(): void
     {
-        $course = Course::factory()->create(['course_category_id' => $this->category->id]);
+        $course = $this->createCourse();
         $chapter = Chapter::factory()->create(['course_id' => $course->id]);
 
-        $res = $this->actingAs($this->admin)
+        $this->actingAs($this->admin)
             ->postJson("/api/v1/admin/chapters/{$chapter->uuid}/lessons", [
                 'title' => 'Lesson 1',
                 'type' => 'text',
-            ]);
+            ])
+            ->assertStatus(201);
 
-        $res->assertStatus(201);
         $this->assertDatabaseHas('lessons', ['chapter_id' => $chapter->id, 'title' => 'Lesson 1']);
     }
 
     public function test_admin_can_delete_lesson(): void
     {
-        $course = Course::factory()->create(['course_category_id' => $this->category->id]);
-        $chapter = Chapter::factory()->create(['course_id' => $course->id]);
-        $lesson = Lesson::factory()->create(['chapter_id' => $chapter->id]);
+        [, , $lesson] = $this->createLesson();
 
         $this->actingAs($this->admin)
             ->deleteJson("/api/v1/admin/lessons/{$lesson->uuid}")
             ->assertOk();
 
-        $this->assertDatabaseMissing('lessons', ['id' => $lesson->id, 'deleted_at' => null]);
+        $this->assertSoftDeleted('lessons', ['id' => $lesson->id]);
     }
 
     // ── Quiz CRUD ──────────────────────────────
 
     public function test_admin_can_add_quiz(): void
     {
-        $course = Course::factory()->create(['course_category_id' => $this->category->id]);
-        $chapter = Chapter::factory()->create(['course_id' => $course->id]);
-        $lesson = Lesson::factory()->create(['chapter_id' => $chapter->id]);
+        [, , $lesson] = $this->createLesson();
 
-        $res = $this->actingAs($this->admin)
+        $this->actingAs($this->admin)
             ->postJson("/api/v1/admin/lessons/{$lesson->uuid}/quiz", [
                 'type' => 'choice',
                 'questionText' => 'Test question?',
                 'options' => ['A', 'B', 'C'],
                 'correctOptionIndex' => 0,
-            ]);
+            ])
+            ->assertStatus(201);
 
-        $res->assertStatus(201);
         $this->assertDatabaseHas('quiz_questions', ['lesson_id' => $lesson->id]);
     }
 
