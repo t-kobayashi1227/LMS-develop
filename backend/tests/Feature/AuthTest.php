@@ -21,6 +21,7 @@ class AuthTest extends TestCase
         $response = $this->postJson('/api/v1/login', [
             'email' => 'test@example.com',
             'password' => 'password',
+            'role' => 'student',
         ]);
 
         $response->assertOk()
@@ -37,11 +38,13 @@ class AuthTest extends TestCase
         User::factory()->create([
             'email' => 'test@example.com',
             'password' => 'password',
+            'role' => 'student',
         ]);
 
         $response = $this->postJson('/api/v1/login', [
             'email' => 'test@example.com',
             'password' => 'wrong',
+            'role' => 'student',
         ]);
 
         $response->assertUnprocessable();
@@ -95,12 +98,14 @@ class AuthTest extends TestCase
         $user = User::factory()->create([
             'email' => 'test@example.com',
             'password' => 'password',
+            'role' => 'student',
             'last_active_at' => null,
         ]);
 
         $this->postJson('/api/v1/login', [
             'email' => 'test@example.com',
             'password' => 'password',
+            'role' => 'student',
         ]);
 
         $user->refresh();
@@ -112,11 +117,13 @@ class AuthTest extends TestCase
         User::factory()->create([
             'email' => 'test@example.com',
             'password' => 'password',
+            'role' => 'student',
         ]);
 
         $this->postJson('/api/v1/login', [
             'email' => 'test@example.com',
             'password' => 'password',
+            'role' => 'student',
         ]);
 
         $this->assertDatabaseHas('activity_logs', [
