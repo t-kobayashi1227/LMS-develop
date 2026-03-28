@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useMemo, useCallback } from 'react';
+import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { ArrowLeft, PlayCircle, FileText, CheckCircle2, Lock, Download, Lightbulb, List, ChevronUp } from 'lucide-react';
 import type { CourseChapters, Lesson, LessonDetail } from '@/lib/types';
+import SafeHtml from '@/components/SafeHtml';
 
 interface LessonViewProps {
   courseData: CourseChapters;
@@ -32,6 +33,18 @@ export default function LessonView({ courseData, initialLessonId, initialLessonD
   const progressPercent = courseData.totalLessons > 0
     ? Math.round((courseData.completedLessons / courseData.totalLessons) * 100)
     : 0;
+
+  // 進捗記録: レッスン表示時にAPIを呼ぶ
+  const progressSent = useRef<Set<string>>(new Set());
+  useEffect(() => {
+    if (!activeLessonId || progressSent.current.has(activeLessonId)) return;
+    progressSent.current.add(activeLessonId);
+    fetch(`/api/lessons/${activeLessonId}/progress`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ completed: false }),
+    }).catch(() => {});
+  }, [activeLessonId]);
 
   const fetchLessonDetail = useCallback(async (lessonId: string) => {
     setDetailLoading(true);
@@ -151,13 +164,23 @@ export default function LessonView({ courseData, initialLessonId, initialLessonD
                 <h4 className="font-bold mb-4 font-headline">ダウンロード資料</h4>
                 <div className="space-y-3">
                   {lessonDetail!.resources.map((r) => (
-                    <button key={r.id} className="w-full flex items-center justify-between p-3 bg-white rounded-xl border border-outline-variant/10 hover:border-tertiary/30 transition-colors group">
-                      <div className="flex items-center gap-3">
-                        <FileText size={18} className="text-tertiary" />
-                        <span className="text-sm font-medium text-on-surface group-hover:text-tertiary transition-colors">{r.title}</span>
+                    r.url ? (
+                      <a key={r.id} href={r.url} download className="w-full flex items-center justify-between p-3 bg-white rounded-xl border border-outline-variant/10 hover:border-tertiary/30 transition-colors group">
+                        <div className="flex items-center gap-3">
+                          <FileText size={18} className="text-tertiary" />
+                          <span className="text-sm font-medium text-on-surface group-hover:text-tertiary transition-colors">{r.title}</span>
+                        </div>
+                        <Download size={16} className="text-slate-400 group-hover:text-tertiary" />
+                      </a>
+                    ) : (
+                      <div key={r.id} className="w-full flex items-center justify-between p-3 bg-white rounded-xl border border-outline-variant/10 opacity-50">
+                        <div className="flex items-center gap-3">
+                          <FileText size={18} className="text-tertiary" />
+                          <span className="text-sm font-medium text-on-surface">{r.title}</span>
+                        </div>
+                        <span className="text-xs text-secondary">準備中</span>
                       </div>
-                      <Download size={16} className="text-slate-400 group-hover:text-tertiary" />
-                    </button>
+                    )
                   ))}
                 </div>
               </div>
@@ -165,9 +188,9 @@ export default function LessonView({ courseData, initialLessonId, initialLessonD
 
             {/* Content Body */}
             {lessonDetail?.contentBody ? (
-              <div
+              <SafeHtml
+                html={lessonDetail.contentBody}
                 className="prose prose-slate prose-lg max-w-none mb-12 md:mb-16 text-on-surface-variant"
-                dangerouslySetInnerHTML={{ __html: lessonDetail.contentBody }}
               />
             ) : (
               <div className="prose prose-slate prose-lg max-w-none mb-12 md:mb-16 text-on-surface-variant">

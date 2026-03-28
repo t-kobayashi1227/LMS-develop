@@ -29,6 +29,7 @@ export default async function QuizPage({ params, searchParams }: Props) {
   return (
     <QuizView
       courseId={courseId}
+      lessonId={lessonId}
       lessonTitle={lesson.title}
       chapterTitle={lesson.chapterTitle}
       questions={lesson.quizQuestions}

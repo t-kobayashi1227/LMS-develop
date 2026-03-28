@@ -9,6 +9,7 @@ use App\Models\Course;
 use App\Models\Enrollment;
 use App\Models\Lesson;
 use App\Models\LessonProgress;
+use App\Models\QuizAnswer;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
@@ -26,6 +27,10 @@ class LessonController extends Controller
         $enrollment = Enrollment::where('user_id', $user->id)
             ->where('course_id', $course->id)
             ->first();
+
+        if (!$enrollment) {
+            abort(403, 'このコースに受講登録されていません。');
+        }
 
         $chapters = $course->chapters()
             ->with(['lessons' => fn ($q) => $q->whereNull('deleted_at')->orderBy('sort_order')])
@@ -74,6 +79,10 @@ class LessonController extends Controller
             ->where('course_id', $lesson->chapter->course_id)
             ->first();
 
+        if (!$enrollment) {
+            abort(403, 'このコースに受講登録されていません。');
+        }
+
         $completedLessonIds = [];
         if ($enrollment) {
             $completedLessonIds = LessonProgress::where('enrollment_id', $enrollment->id)
@@ -117,6 +126,34 @@ class LessonController extends Controller
         }
 
         return response()->json(['data' => ['status' => 'ok']]);
+    }
+
+    public function submitQuizAnswers(Request $request, string $lessonUuid): JsonResponse
+    {
+        $lesson = Lesson::where('uuid', $lessonUuid)->with('chapter')->firstOrFail();
+        $user = $request->user();
+
+        $enrollment = Enrollment::where('user_id', $user->id)
+            ->where('course_id', $lesson->chapter->course_id)
+            ->firstOrFail();
+
+        $request->validate([
+            'answers' => 'required|array',
+            'answers.*.questionId' => 'required|string',
+            'answers.*.answer' => 'required|string',
+        ]);
+
+        foreach ($request->input('answers') as $answer) {
+            QuizAnswer::updateOrCreate(
+                [
+                    'user_id' => $user->id,
+                    'quiz_question_id' => \App\Models\QuizQuestion::where('uuid', $answer['questionId'])->value('id'),
+                ],
+                ['answer_text' => $answer['answer']]
+            );
+        }
+
+        return response()->json(['data' => ['status' => 'submitted']]);
     }
 
     private function isLocked(Lesson $lesson, array $completedLessonIds, ?Enrollment $enrollment): bool

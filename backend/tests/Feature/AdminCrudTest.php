@@ -196,4 +196,24 @@ class AdminCrudTest extends TestCase
             ])
             ->assertStatus(422);
     }
+
+    // ── Enrollment authorization ──────────────────
+
+    public function test_unenrolled_user_cannot_access_chapters(): void
+    {
+        $course = $this->createCourse();
+
+        $this->actingAs($this->student)
+            ->getJson("/api/v1/courses/{$course->uuid}/chapters")
+            ->assertStatus(403);
+    }
+
+    public function test_unenrolled_user_cannot_access_lesson(): void
+    {
+        [, , $lesson] = $this->createLesson();
+
+        $this->actingAs($this->student)
+            ->getJson("/api/v1/lessons/{$lesson->uuid}")
+            ->assertStatus(403);
+    }
 }

@@ -74,7 +74,7 @@ export interface LessonDetail {
   isCompleted: boolean;
   isLocked: boolean;
   sortOrder: number;
-  resources: { id: string; title: string; fileOriginalName: string; fileSizeBytes: number | null; mimeType: string | null }[];
+  resources: { id: string; title: string; fileOriginalName: string; fileSizeBytes: number | null; mimeType: string | null; url: string | null }[];
   quizQuestions: QuizQuestion[];
 }
 

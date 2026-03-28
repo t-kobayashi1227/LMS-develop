@@ -7,23 +7,43 @@ import type { QuizQuestion } from '@/lib/types';
 
 interface Props {
   courseId: string;
+  lessonId: string;
   lessonTitle: string;
   chapterTitle: string;
   questions: QuizQuestion[];
 }
 
-export default function QuizView({ courseId, lessonTitle, chapterTitle, questions }: Props) {
+export default function QuizView({ courseId, lessonId, lessonTitle, chapterTitle, questions }: Props) {
   const [answers, setAnswers] = useState<Record<string, string>>({});
   const [submitted, setSubmitted] = useState(false);
+  const [submitting, setSubmitting] = useState(false);
 
   const allAnswered = questions.every((q) => {
     const answer = answers[q.id];
     return answer && answer.trim() !== '';
   });
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    setSubmitted(true);
+    setSubmitting(true);
+
+    try {
+      await fetch(`/api/lessons/${lessonId}/quiz-answers`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          answers: Object.entries(answers).map(([questionId, answer]) => ({
+            questionId,
+            answer,
+          })),
+        }),
+      });
+    } catch {
+      // 送信失敗しても完了画面は表示（オフライン対応）
+    } finally {
+      setSubmitting(false);
+      setSubmitted(true);
+    }
   };
 
   const lessonUrl = `/student/lesson/${courseId}`;
@@ -160,11 +180,11 @@ export default function QuizView({ courseId, lessonTitle, chapterTitle, question
               </Link>
               <button
                 type="submit"
-                disabled={!allAnswered}
+                disabled={!allAnswered || submitting}
                 className="flex items-center gap-2 px-6 md:px-8 py-3 md:py-4 primary-gradient text-white font-bold rounded-xl shadow-lg shadow-primary/20 hover:shadow-xl hover:shadow-primary/30 transition-all active:scale-95 disabled:opacity-40 disabled:pointer-events-none"
               >
                 <Send size={18} />
-                回答を送信
+                {submitting ? '送信中...' : '回答を送信'}
               </button>
             </div>
           </form>

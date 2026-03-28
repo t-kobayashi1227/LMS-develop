@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Http\Resources\AssignmentResource;
 use App\Models\Assignment;
 use App\Models\AssignmentSubmission;
+use App\Models\Enrollment;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
 
@@ -14,7 +15,10 @@ class AssignmentController extends Controller
     public function index(Request $request): AnonymousResourceCollection
     {
         $user = $request->user();
-        $assignments = Assignment::with('course')->get();
+        $enrolledCourseIds = Enrollment::where('user_id', $user->id)->pluck('course_id');
+        $assignments = Assignment::with('course')
+            ->whereIn('course_id', $enrolledCourseIds)
+            ->get();
 
         $submissions = AssignmentSubmission::where('user_id', $user->id)
             ->pluck('status', 'assignment_id');

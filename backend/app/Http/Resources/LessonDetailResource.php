@@ -9,6 +9,8 @@ class LessonDetailResource extends JsonResource
 {
     public function toArray(Request $request): array
     {
+        $locked = $this->is_locked ?? false;
+
         return [
             'id' => $this->uuid,
             'courseId' => $this->chapter->course->uuid ?? '',
@@ -18,21 +20,22 @@ class LessonDetailResource extends JsonResource
             'title' => $this->title,
             'type' => $this->type,
             'hasVideo' => $this->has_video,
-            'videoUrl' => $this->video_url,
-            'contentBody' => $this->content_body,
+            'videoUrl' => $locked ? null : $this->video_url,
+            'contentBody' => $locked ? null : $this->content_body,
             'duration' => $this->formattedDuration(),
             'durationSeconds' => $this->duration_seconds,
             'isCompleted' => $this->is_completed ?? false,
-            'isLocked' => $this->is_locked ?? false,
+            'isLocked' => $locked,
             'sortOrder' => $this->sort_order,
-            'resources' => $this->resources->map(fn ($r) => [
+            'resources' => $locked ? [] : $this->resources->map(fn ($r) => [
                 'id' => $r->uuid,
                 'title' => $r->title,
                 'fileOriginalName' => $r->file_original_name,
                 'fileSizeBytes' => $r->file_size_bytes,
                 'mimeType' => $r->mime_type,
+                'url' => $r->file_path,
             ]),
-            'quizQuestions' => QuizQuestionResource::collection($this->quizQuestions),
+            'quizQuestions' => $locked ? [] : QuizQuestionResource::collection($this->quizQuestions),
         ];
     }
 }

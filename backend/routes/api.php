@@ -29,6 +29,7 @@ Route::prefix('v1')->group(function () {
         Route::get('/courses/{courseUuid}/chapters', [LessonController::class, 'chapters']);
         Route::get('/lessons/{lessonUuid}', [LessonController::class, 'show']);
         Route::post('/lessons/{lessonUuid}/progress', [LessonController::class, 'updateProgress']);
+        Route::post('/lessons/{lessonUuid}/quiz-answers', [LessonController::class, 'submitQuizAnswers']);
         Route::get('/assignments', [AssignmentController::class, 'index']);
 
         // Admin only
