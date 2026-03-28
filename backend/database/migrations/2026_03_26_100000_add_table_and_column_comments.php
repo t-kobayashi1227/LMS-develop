@@ -107,7 +107,7 @@ return new class extends Migration
             ['enrollments', 'uuid', "CHAR(36) NOT NULL", 'API公開用UUID'],
             ['enrollments', 'user_id', 'BIGINT UNSIGNED NOT NULL', '受講者ID（FK→users）'],
             ['enrollments', 'course_id', 'BIGINT UNSIGNED NOT NULL', 'コースID（FK→courses）'],
-            ['enrollments', 'enrolled_at', 'TIMESTAMP NOT NULL', '登録日時'],
+            ['enrollments', 'enrolled_at', 'TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP', '登録日時'],
             ['enrollments', 'completed_at', 'TIMESTAMP NULL DEFAULT NULL', '全レッスン完了日時'],
             ['enrollments', 'created_at', 'TIMESTAMP NULL DEFAULT NULL', '作成日時'],
             ['enrollments', 'updated_at', 'TIMESTAMP NULL DEFAULT NULL', '更新日時'],
@@ -150,7 +150,7 @@ return new class extends Migration
             ['assignment_submissions', 'graded_by', 'BIGINT UNSIGNED NULL DEFAULT NULL', '採点者ID（FK→users）'],
             ['assignment_submissions', 'graded_at', 'TIMESTAMP NULL DEFAULT NULL', '採点日時'],
             ['assignment_submissions', 'feedback', 'TEXT NULL', '採点フィードバック'],
-            ['assignment_submissions', 'submitted_at', 'TIMESTAMP NOT NULL', '提出日時'],
+            ['assignment_submissions', 'submitted_at', 'TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP', '提出日時'],
             ['assignment_submissions', 'created_at', 'TIMESTAMP NULL DEFAULT NULL', '作成日時'],
             ['assignment_submissions', 'updated_at', 'TIMESTAMP NULL DEFAULT NULL', '更新日時'],
 
@@ -177,7 +177,7 @@ return new class extends Migration
             ['quiz_answers', 'graded_by', 'BIGINT UNSIGNED NULL DEFAULT NULL', '採点者ID（FK→users）'],
             ['quiz_answers', 'graded_at', 'TIMESTAMP NULL DEFAULT NULL', '採点日時'],
             ['quiz_answers', 'feedback', 'TEXT NULL', '採点フィードバック'],
-            ['quiz_answers', 'submitted_at', 'TIMESTAMP NOT NULL', '回答提出日時'],
+            ['quiz_answers', 'submitted_at', 'TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP', '回答提出日時'],
             ['quiz_answers', 'created_at', 'TIMESTAMP NULL DEFAULT NULL', '作成日時'],
             ['quiz_answers', 'updated_at', 'TIMESTAMP NULL DEFAULT NULL', '更新日時'],
 
