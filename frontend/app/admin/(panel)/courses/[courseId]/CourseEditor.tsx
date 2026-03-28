@@ -43,7 +43,6 @@ interface CourseData {
 
 interface Props {
   course: CourseData;
-  categories: string[];
 }
 
 async function apiCall(path: string, method: string, body?: unknown) {
@@ -59,7 +58,7 @@ async function apiCall(path: string, method: string, body?: unknown) {
   return res.json();
 }
 
-export default function CourseEditor({ course: initial, categories }: Props) {
+export default function CourseEditor({ course: initial }: Props) {
   const [course, setCourse] = useState(initial);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState('');

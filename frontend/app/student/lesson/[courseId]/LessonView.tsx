@@ -34,17 +34,19 @@ export default function LessonView({ courseData, initialLessonId, initialLessonD
     ? Math.round((courseData.completedLessons / courseData.totalLessons) * 100)
     : 0;
 
-  // 進捗記録: レッスン表示時にAPIを呼ぶ
   const progressSent = useRef<Set<string>>(new Set());
   useEffect(() => {
     if (!activeLessonId || progressSent.current.has(activeLessonId)) return;
     progressSent.current.add(activeLessonId);
+    // テキスト/課題レッスンは閲覧で完了、動画レッスンは started のみ
+    const activeLesson = allLessons.find(l => l.id === activeLessonId);
+    const markCompleted = activeLesson?.type !== 'video';
     fetch(`/api/lessons/${activeLessonId}/progress`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ completed: false }),
+      body: JSON.stringify({ completed: markCompleted }),
     }).catch(() => {});
-  }, [activeLessonId]);
+  }, [activeLessonId, allLessons]);
 
   const fetchLessonDetail = useCallback(async (lessonId: string) => {
     setDetailLoading(true);

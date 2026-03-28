@@ -9,11 +9,7 @@ interface Category {
   name: string;
 }
 
-interface Props {
-  categories: string[];
-}
-
-export default function NewCourseForm({ categories: categoryNames }: Props) {
+export default function NewCourseForm() {
   const [title, setTitle] = useState('');
   const [description, setDescription] = useState('');
   const [categoryId, setCategoryId] = useState('');

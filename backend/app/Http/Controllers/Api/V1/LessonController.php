@@ -154,7 +154,7 @@ class LessonController extends Controller
         $questionIds = \App\Models\QuizQuestion::whereIn(
             'uuid',
             array_column($request->input('answers'), 'questionId')
-        )->pluck('id', 'uuid');
+        )->where('lesson_id', $lesson->id)->pluck('id', 'uuid');
 
         foreach ($request->input('answers') as $answer) {
             $qId = $questionIds[$answer['questionId']] ?? null;
@@ -162,7 +162,7 @@ class LessonController extends Controller
 
             QuizAnswer::updateOrCreate(
                 ['user_id' => $user->id, 'quiz_question_id' => $qId],
-                ['answer_text' => $answer['answer']]
+                ['answer_text' => $answer['answer'], 'submitted_at' => now()]
             );
         }
 

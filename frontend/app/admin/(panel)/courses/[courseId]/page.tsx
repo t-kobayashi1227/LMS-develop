@@ -1,6 +1,5 @@
 import type { Metadata } from 'next';
 import { fetchData } from '@/lib/apiClient';
-import { getCourseCategories } from '@/lib/api';
 import CourseEditor from './CourseEditor';
 
 export const metadata: Metadata = {
@@ -13,10 +12,7 @@ interface Props {
 
 export default async function CourseEditPage({ params }: Props) {
   const { courseId } = await params;
-  const [course, categories] = await Promise.all([
-    fetchData<Parameters<typeof CourseEditor>[0]['course']>(`/admin/courses/${courseId}`),
-    getCourseCategories(),
-  ]);
+  const course = await fetchData<Parameters<typeof CourseEditor>[0]['course']>(`/admin/courses/${courseId}`);
 
-  return <CourseEditor course={course} categories={categories} />;
+  return <CourseEditor course={course} />;
 }

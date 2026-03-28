@@ -23,12 +23,15 @@ export default function QuizView({ courseId, lessonId, lessonTitle, chapterTitle
     return answer && answer.trim() !== '';
   });
 
+  const [submitError, setSubmitError] = useState(false);
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setSubmitting(true);
+    setSubmitError(false);
 
     try {
-      await fetch(`/api/lessons/${lessonId}/quiz-answers`, {
+      const res = await fetch(`/api/lessons/${lessonId}/quiz-answers`, {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
@@ -38,11 +41,18 @@ export default function QuizView({ courseId, lessonId, lessonTitle, chapterTitle
           })),
         }),
       });
+
+      if (!res.ok) {
+        setSubmitError(true);
+        setSubmitting(false);
+        return;
+      }
+
+      setSubmitted(true);
     } catch {
-      // 送信失敗しても完了画面は表示（オフライン対応）
+      setSubmitError(true);
     } finally {
       setSubmitting(false);
-      setSubmitted(true);
     }
   };
 
@@ -172,6 +182,12 @@ export default function QuizView({ courseId, lessonId, lessonTitle, chapterTitle
                 )}
               </div>
             ))}
+
+            {submitError && (
+              <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-red-600 text-sm">
+                送信に失敗しました。もう一度お試しください。
+              </div>
+            )}
 
             <div className="pt-4 flex items-center justify-between">
               <Link href={lessonUrl} className="text-sm font-bold text-secondary hover:text-on-surface transition-colors flex items-center gap-2">
