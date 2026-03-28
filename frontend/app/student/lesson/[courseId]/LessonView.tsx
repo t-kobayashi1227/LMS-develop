@@ -47,7 +47,7 @@ export default function LessonView({ courseData, initialLessonId, initialLessonD
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ completed: markCompleted }),
     }).catch(() => {});
-  }, [activeLessonId, allLessons]);
+  }, [activeLessonId]); // allLessons excluded: stable ref from useMemo on courseData
 
   const fetchLessonDetail = useCallback(async (lessonId: string) => {
     setDetailLoading(true);
