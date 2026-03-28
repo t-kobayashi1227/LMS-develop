@@ -16,9 +16,9 @@ class CourseRatingSeeder extends Seeder
 
         // mockData.ts の satisfaction に近い平均評価を生成
         $targetRatings = [
-            'ai-editorial-strategy' => 4.8,
-            'data-science-python' => 4.5,
-            'ux-design-pro' => 4.7,
+            'ai-introduction' => 4.8,
+            'generative-ai-prompt' => 4.5,
+            'ai-design' => 4.7,
         ];
 
         foreach ($courses as $course) {

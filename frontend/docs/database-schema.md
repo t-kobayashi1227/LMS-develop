@@ -79,7 +79,7 @@ users
 | created_at | TIMESTAMP | NOT NULL, DEFAULT CURRENT_TIMESTAMP |
 | updated_at | TIMESTAMP | NOT NULL, DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP |
 
-**シードデータ:** AI Writing, Data Science, Design, Marketing
+**シードデータ:** AI Basics, AI Applications, Design, Marketing
 
 ---
 

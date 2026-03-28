@@ -14,9 +14,9 @@ class EnrollmentSeeder extends Seeder
         $students = User::where('role', 'student')->get();
         $courses = Course::all();
 
-        $c1 = $courses->where('slug', 'ai-editorial-strategy')->first();
-        $c2 = $courses->where('slug', 'data-science-python')->first();
-        $c3 = $courses->where('slug', 'ux-design-pro')->first();
+        $c1 = $courses->where('slug', 'ai-introduction')->first();
+        $c2 = $courses->where('slug', 'generative-ai-prompt')->first();
+        $c3 = $courses->where('slug', 'ai-design')->first();
 
         // 田中 健太: 3コース登録
         $tanaka = $students->where('email', 'kenta.tanaka@example.com')->first();

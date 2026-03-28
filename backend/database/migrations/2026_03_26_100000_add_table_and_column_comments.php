@@ -15,7 +15,7 @@ return new class extends Migration
         // ── テーブルコメント ──────────────────────────────────
         $tables = [
             'users' => 'ユーザー（受講者・管理者）',
-            'course_categories' => 'コースカテゴリ（AI Writing, Data Science 等）',
+            'course_categories' => 'コースカテゴリ（AI Basics, AI Applications 等）',
             'courses' => 'コース',
             'chapters' => 'コース内の章（セクション）',
             'lessons' => 'レッスン（動画・テキスト・課題）',
@@ -56,7 +56,7 @@ return new class extends Migration
             // course_categories
             ['course_categories', 'id', 'BIGINT UNSIGNED NOT NULL AUTO_INCREMENT', '内部ID'],
             ['course_categories', 'uuid', "CHAR(36) NOT NULL", 'API公開用UUID'],
-            ['course_categories', 'name', 'VARCHAR(100) NOT NULL', 'カテゴリ名（例: AI Writing）'],
+            ['course_categories', 'name', 'VARCHAR(100) NOT NULL', 'カテゴリ名（例: AI Basics）'],
             ['course_categories', 'slug', 'VARCHAR(100) NOT NULL', 'URL用スラッグ'],
             ['course_categories', 'sort_order', 'SMALLINT UNSIGNED NOT NULL DEFAULT 0', '表示順'],
             ['course_categories', 'created_at', 'TIMESTAMP NULL DEFAULT NULL', '作成日時'],

@@ -27,23 +27,23 @@ class AssignmentSeeder extends Seeder
         }
 
         // mockData.ts に対応する追加課題
-        $c2 = Course::where('slug', 'data-science-python')->first();
+        $c2 = Course::where('slug', 'generative-ai-prompt')->first();
         Assignment::create([
             'lesson_id' => null,
             'course_id' => $c2->id,
-            'title' => 'マーケティング分析レポート作成',
-            'description' => 'データサイエンスの手法を活用してマーケティングデータを分析し、レポートを作成してください。',
+            'title' => 'AI活用による業務改善レポート作成',
+            'description' => '生成AIを活用して業務プロセスの改善案を分析し、レポートを作成してください。',
             'due_date' => now(),
             'max_score' => 100.00,
             'sort_order' => 99,
         ]);
 
-        $c3 = Course::where('slug', 'ux-design-pro')->first();
+        $c3 = Course::where('slug', 'ai-design')->first();
         Assignment::create([
             'lesson_id' => null,
             'course_id' => $c3->id,
-            'title' => 'デザインシステムの構築演習',
-            'description' => '指定されたブランドに基づいてデザインシステムを構築してください。',
+            'title' => 'AI生成画像を活用したデザイン演習',
+            'description' => '画像生成AIを使ってブランドイメージに合ったビジュアルを制作してください。',
             'due_date' => now()->addDays(3),
             'max_score' => 100.00,
             'sort_order' => 99,

@@ -54,26 +54,26 @@ class LessonProgressSeeder extends Seeder
         // mockData.ts の進捗率に合わせる
         $progressMap = [
             'kenta.tanaka@example.com' => [
-                'ai-editorial-strategy' => 15,  // 65% of 24
-                'data-science-python' => 2,      // 12% of 18
-                'ux-design-pro' => 0,            // 0%
+                'ai-introduction' => 15,         // 65% of 24
+                'generative-ai-prompt' => 2,     // 12% of 18
+                'ai-design' => 0,                // 0%
             ],
             'misaki.suzuki@example.com' => [
-                'ai-editorial-strategy' => 20,
-                'data-science-python' => 15,
-                'ux-design-pro' => 10,
+                'ai-introduction' => 20,
+                'generative-ai-prompt' => 15,
+                'ai-design' => 10,
             ],
             'daisuke.takahashi@example.com' => [
-                'ai-editorial-strategy' => 3,
-                'data-science-python' => 1,
+                'ai-introduction' => 3,
+                'generative-ai-prompt' => 1,
             ],
             'sakura.watanabe@example.com' => [
-                'ai-editorial-strategy' => 10,
-                'data-science-python' => 8,
-                'ux-design-pro' => 5,
+                'ai-introduction' => 10,
+                'generative-ai-prompt' => 8,
+                'ai-design' => 5,
             ],
             'makoto.ito@example.com' => [
-                'data-science-python' => 0,
+                'generative-ai-prompt' => 0,
             ],
         ];
 
