@@ -110,7 +110,11 @@ class LessonController extends Controller
         $user = $request->user();
         $enrollment = Enrollment::where('user_id', $user->id)
             ->where('course_id', $lesson->chapter->course_id)
-            ->firstOrFail();
+            ->first();
+
+        if (!$enrollment) {
+            abort(403, 'このコースに受講登録されていません。');
+        }
 
         $progress = LessonProgress::firstOrCreate(
             ['enrollment_id' => $enrollment->id, 'lesson_id' => $lesson->id],
@@ -135,7 +139,11 @@ class LessonController extends Controller
 
         $enrollment = Enrollment::where('user_id', $user->id)
             ->where('course_id', $lesson->chapter->course_id)
-            ->firstOrFail();
+            ->first();
+
+        if (!$enrollment) {
+            abort(403, 'このコースに受講登録されていません。');
+        }
 
         $request->validate([
             'answers' => 'required|array',
@@ -143,12 +151,17 @@ class LessonController extends Controller
             'answers.*.answer' => 'required|string',
         ]);
 
+        $questionIds = \App\Models\QuizQuestion::whereIn(
+            'uuid',
+            array_column($request->input('answers'), 'questionId')
+        )->pluck('id', 'uuid');
+
         foreach ($request->input('answers') as $answer) {
+            $qId = $questionIds[$answer['questionId']] ?? null;
+            if (!$qId) continue;
+
             QuizAnswer::updateOrCreate(
-                [
-                    'user_id' => $user->id,
-                    'quiz_question_id' => \App\Models\QuizQuestion::where('uuid', $answer['questionId'])->value('id'),
-                ],
+                ['user_id' => $user->id, 'quiz_question_id' => $qId],
                 ['answer_text' => $answer['answer']]
             );
         }
