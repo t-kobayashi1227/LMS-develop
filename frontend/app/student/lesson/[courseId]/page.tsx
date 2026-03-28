@@ -1,5 +1,5 @@
 import type { Metadata } from 'next';
-import { getCourseChapters, getLesson } from '@/lib/api';
+import { getCourseChapters, getLesson, getCurrentUser } from '@/lib/api';
 
 export const metadata: Metadata = {
   title: 'レッスン | Niigata AI Academy',
@@ -12,7 +12,12 @@ interface Props {
 
 export default async function LessonPage({ params }: Props) {
   const { courseId } = await params;
-  const courseData = await getCourseChapters(courseId);
+  const [courseData, user] = await Promise.all([
+    getCourseChapters(courseId),
+    getCurrentUser(),
+  ]);
+
+  const backHref = user.role === 'admin' ? '/admin/courses' : '/student/dashboard';
 
   const allLessons = courseData.chapters.flatMap(ch => ch.lessons);
   const firstIncomplete = allLessons.find(l => !l.isCompleted && !l.isLocked);
@@ -25,6 +30,7 @@ export default async function LessonPage({ params }: Props) {
       courseData={courseData}
       initialLessonId={activeLessonId}
       initialLessonDetail={initialLesson}
+      backHref={backHref}
     />
   );
 }

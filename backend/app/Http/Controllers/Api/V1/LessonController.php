@@ -16,6 +16,26 @@ use Illuminate\Http\Request;
 class LessonController extends Controller
 {
     /**
+     * 受講登録を取得。管理者はenrollmentなしでもアクセス可。
+     */
+    private function resolveEnrollment($user, int $courseId): ?Enrollment
+    {
+        if ($user->isAdmin()) {
+            return null;
+        }
+
+        $enrollment = Enrollment::where('user_id', $user->id)
+            ->where('course_id', $courseId)
+            ->first();
+
+        if (!$enrollment) {
+            abort(403, 'このコースに受講登録されていません。');
+        }
+
+        return $enrollment;
+    }
+
+    /**
      * コースのチャプター構造（プレイリスト用）
      * GET /api/v1/courses/{courseUuid}/chapters
      */
@@ -23,14 +43,7 @@ class LessonController extends Controller
     {
         $course = Course::where('uuid', $courseUuid)->firstOrFail();
         $user = $request->user();
-
-        $enrollment = Enrollment::where('user_id', $user->id)
-            ->where('course_id', $course->id)
-            ->first();
-
-        if (!$enrollment) {
-            abort(403, 'このコースに受講登録されていません。');
-        }
+        $enrollment = $this->resolveEnrollment($user, $course->id);
 
         $chapters = $course->chapters()
             ->with(['lessons' => fn ($q) => $q->whereNull('deleted_at')->orderBy('sort_order')])
@@ -75,13 +88,7 @@ class LessonController extends Controller
             ->firstOrFail();
 
         $user = $request->user();
-        $enrollment = Enrollment::where('user_id', $user->id)
-            ->where('course_id', $lesson->chapter->course_id)
-            ->first();
-
-        if (!$enrollment) {
-            abort(403, 'このコースに受講登録されていません。');
-        }
+        $enrollment = $this->resolveEnrollment($user, $lesson->chapter->course_id);
 
         $completedLessonIds = [];
         if ($enrollment) {
@@ -108,12 +115,10 @@ class LessonController extends Controller
             ->firstOrFail();
 
         $user = $request->user();
-        $enrollment = Enrollment::where('user_id', $user->id)
-            ->where('course_id', $lesson->chapter->course_id)
-            ->first();
+        $enrollment = $this->resolveEnrollment($user, $lesson->chapter->course_id);
 
         if (!$enrollment) {
-            abort(403, 'このコースに受講登録されていません。');
+            return response()->json(['data' => ['status' => 'ok']]);
         }
 
         $progress = LessonProgress::firstOrCreate(
@@ -136,13 +141,10 @@ class LessonController extends Controller
     {
         $lesson = Lesson::where('uuid', $lessonUuid)->with('chapter')->firstOrFail();
         $user = $request->user();
-
-        $enrollment = Enrollment::where('user_id', $user->id)
-            ->where('course_id', $lesson->chapter->course_id)
-            ->first();
+        $enrollment = $this->resolveEnrollment($user, $lesson->chapter->course_id);
 
         if (!$enrollment) {
-            abort(403, 'このコースに受講登録されていません。');
+            return response()->json(['data' => ['status' => 'submitted']]);
         }
 
         $request->validate([
@@ -172,7 +174,7 @@ class LessonController extends Controller
     private function isLocked(Lesson $lesson, array $completedLessonIds, ?Enrollment $enrollment): bool
     {
         if (!$enrollment) {
-            return true;
+            return false;
         }
         if (!$lesson->prerequisite_lesson_id) {
             return false;

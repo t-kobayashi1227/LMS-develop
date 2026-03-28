@@ -11,9 +11,10 @@ interface LessonViewProps {
   courseData: CourseChapters;
   initialLessonId: string;
   initialLessonDetail: LessonDetail | null;
+  backHref?: string;
 }
 
-export default function LessonView({ courseData, initialLessonId, initialLessonDetail }: LessonViewProps) {
+export default function LessonView({ courseData, initialLessonId, initialLessonDetail, backHref = '/student/dashboard' }: LessonViewProps) {
   const [activeLessonId, setActiveLessonId] = useState(initialLessonId);
   const [lessonDetail, setLessonDetail] = useState<LessonDetail | null>(initialLessonDetail);
   const [detailLoading, setDetailLoading] = useState(false);
@@ -82,7 +83,7 @@ export default function LessonView({ courseData, initialLessonId, initialLessonD
       {/* Header */}
       <header className="h-14 md:h-16 bg-on-secondary-fixed text-white flex items-center justify-between px-3 md:px-6 shrink-0 z-20">
         <div className="flex items-center gap-2 md:gap-4 min-w-0">
-          <Link href="/student/dashboard" className="p-2 hover:bg-white/10 rounded-full transition-colors shrink-0" aria-label="ダッシュボードに戻る">
+          <Link href={backHref} className="p-2 hover:bg-white/10 rounded-full transition-colors shrink-0" aria-label="戻る">
             <ArrowLeft size={20} />
           </Link>
           <h1 className="font-bold text-xs md:text-base truncate max-w-[180px] sm:max-w-xs md:max-w-md font-headline">
