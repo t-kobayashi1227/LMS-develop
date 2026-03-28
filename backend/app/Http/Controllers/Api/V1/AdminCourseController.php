@@ -92,6 +92,7 @@ class AdminCourseController extends Controller
                             'options' => $q->options,
                             'correctOptionIndex' => $q->correct_option_index,
                             'conditions' => $q->conditions,
+                            'explanation' => $q->explanation,
                         ]),
                     ]),
                 ]),
@@ -247,6 +248,7 @@ class AdminCourseController extends Controller
             'options' => 'nullable|array',
             'correctOptionIndex' => 'nullable|integer|min:0',
             'conditions' => 'nullable|array',
+            'explanation' => 'nullable|string',
         ]);
 
         $maxOrder = $lesson->quizQuestions()->max('sort_order') ?? -1;
@@ -257,6 +259,7 @@ class AdminCourseController extends Controller
             'options' => $validated['options'] ?? null,
             'correct_option_index' => $validated['correctOptionIndex'] ?? null,
             'conditions' => $validated['conditions'] ?? null,
+            'explanation' => $validated['explanation'] ?? null,
             'sort_order' => $maxOrder + 1,
         ]);
 
@@ -272,6 +275,7 @@ class AdminCourseController extends Controller
             'options' => 'nullable|array',
             'correctOptionIndex' => 'nullable|integer|min:0',
             'conditions' => 'nullable|array',
+            'explanation' => 'nullable|string',
         ]);
 
         if (isset($validated['type'])) $question->type = $validated['type'];
@@ -279,6 +283,7 @@ class AdminCourseController extends Controller
         if (array_key_exists('options', $validated)) $question->options = $validated['options'];
         if (array_key_exists('correctOptionIndex', $validated)) $question->correct_option_index = $validated['correctOptionIndex'];
         if (array_key_exists('conditions', $validated)) $question->conditions = $validated['conditions'];
+        if (array_key_exists('explanation', $validated)) $question->explanation = $validated['explanation'];
         $question->save();
 
         return response()->json(['data' => ['id' => $question->uuid]]);

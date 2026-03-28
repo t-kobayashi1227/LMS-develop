@@ -13,7 +13,7 @@ class QuizQuestion extends Model
 
     protected $fillable = [
         'lesson_id', 'type', 'question_text', 'options',
-        'correct_option_index', 'conditions', 'sort_order',
+        'correct_option_index', 'conditions', 'explanation', 'sort_order',
     ];
 
     protected function casts(): array

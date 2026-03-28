@@ -10,11 +10,24 @@ use App\Models\Enrollment;
 use App\Models\Lesson;
 use App\Models\LessonProgress;
 use App\Models\QuizAnswer;
+use App\Models\QuizQuestion;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class LessonController extends Controller
 {
+    private function getCompletedLessonIds(?Enrollment $enrollment): array
+    {
+        if (!$enrollment) {
+            return [];
+        }
+
+        return LessonProgress::where('enrollment_id', $enrollment->id)
+            ->whereNotNull('completed_at')
+            ->pluck('lesson_id')
+            ->toArray();
+    }
+
     /**
      * 受講登録を取得。管理者はenrollmentなしでもアクセス可。
      */
@@ -50,14 +63,7 @@ class LessonController extends Controller
             ->orderBy('sort_order')
             ->get();
 
-        // 進捗・ロック状態を付与
-        $completedLessonIds = [];
-        if ($enrollment) {
-            $completedLessonIds = LessonProgress::where('enrollment_id', $enrollment->id)
-                ->whereNotNull('completed_at')
-                ->pluck('lesson_id')
-                ->toArray();
-        }
+        $completedLessonIds = $this->getCompletedLessonIds($enrollment);
 
         $chapters->each(function ($chapter) use ($completedLessonIds, $enrollment) {
             $chapter->lessons->each(function ($lesson) use ($completedLessonIds, $enrollment) {
@@ -90,14 +96,7 @@ class LessonController extends Controller
         $user = $request->user();
         $enrollment = $this->resolveEnrollment($user, $lesson->chapter->course_id);
 
-        $completedLessonIds = [];
-        if ($enrollment) {
-            $completedLessonIds = LessonProgress::where('enrollment_id', $enrollment->id)
-                ->whereNotNull('completed_at')
-                ->pluck('lesson_id')
-                ->toArray();
-        }
-
+        $completedLessonIds = $this->getCompletedLessonIds($enrollment);
         $lesson->is_completed = in_array($lesson->id, $completedLessonIds);
         $lesson->is_locked = $this->isLocked($lesson, $completedLessonIds, $enrollment);
 
@@ -143,8 +142,15 @@ class LessonController extends Controller
         $user = $request->user();
         $enrollment = $this->resolveEnrollment($user, $lesson->chapter->course_id);
 
-        if (!$enrollment) {
-            return response()->json(['data' => ['status' => 'submitted']]);
+        if ($enrollment && $lesson->prerequisite_lesson_id) {
+            $prerequisiteCompleted = LessonProgress::where('enrollment_id', $enrollment->id)
+                ->where('lesson_id', $lesson->prerequisite_lesson_id)
+                ->whereNotNull('completed_at')
+                ->exists();
+
+            if (!$prerequisiteCompleted) {
+                return response()->json(['message' => 'Lesson is locked'], 403);
+            }
         }
 
         $request->validate([
@@ -153,22 +159,57 @@ class LessonController extends Controller
             'answers.*.answer' => 'required|string',
         ]);
 
-        $questionIds = \App\Models\QuizQuestion::whereIn(
-            'uuid',
-            array_column($request->input('answers'), 'questionId')
-        )->where('lesson_id', $lesson->id)->pluck('id', 'uuid');
+        $submittedIds = array_column($request->input('answers'), 'questionId');
+        $questions = QuizQuestion::whereIn('uuid', $submittedIds)
+            ->where('lesson_id', $lesson->id)
+            ->get()
+            ->keyBy('uuid');
 
-        foreach ($request->input('answers') as $answer) {
-            $qId = $questionIds[$answer['questionId']] ?? null;
-            if (!$qId) continue;
-
-            QuizAnswer::updateOrCreate(
-                ['user_id' => $user->id, 'quiz_question_id' => $qId],
-                ['answer_text' => $answer['answer'], 'submitted_at' => now()]
-            );
+        if ($questions->count() !== count($submittedIds)) {
+            return response()->json(['message' => 'Invalid question IDs'], 422);
         }
 
-        return response()->json(['data' => ['status' => 'submitted']]);
+        $results = [];
+
+        foreach ($request->input('answers') as $answer) {
+            $question = $questions[$answer['questionId']] ?? null;
+            if (!$question) continue;
+
+            $data = [
+                'answer_text' => $answer['answer'],
+                'selected_option_index' => null,
+                'is_correct' => null,
+                'submitted_at' => now(),
+            ];
+
+            $isCorrect = false;
+            if ($question->type === 'choice') {
+                $selectedIndex = array_search($answer['answer'], $question->options ?? []);
+                $isCorrect = ($selectedIndex !== false && $selectedIndex === $question->correct_option_index);
+                $data['selected_option_index'] = $selectedIndex !== false ? $selectedIndex : null;
+                $data['is_correct'] = $isCorrect;
+            }
+
+            QuizAnswer::updateOrCreate(
+                ['user_id' => $user->id, 'quiz_question_id' => $question->id],
+                $data
+            );
+
+            $result = [
+                'questionId' => $question->uuid,
+                'type' => $question->type,
+                'explanation' => $question->explanation,
+            ];
+
+            if ($question->type === 'choice') {
+                $result['isCorrect'] = $isCorrect;
+                $result['correctOptionIndex'] = $question->correct_option_index;
+            }
+
+            $results[] = $result;
+        }
+
+        return response()->json(['data' => ['status' => 'submitted', 'results' => $results]]);
     }
 
     private function isLocked(Lesson $lesson, array $completedLessonIds, ?Enrollment $enrollment): bool
