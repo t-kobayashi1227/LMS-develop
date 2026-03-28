@@ -82,6 +82,8 @@ jobs:
         run: |
           rsync -azv --delete \
             --exclude='.env' \
+            --exclude='.htaccess' \
+            --exclude='.user.ini' \
             --exclude='storage/app/' \
             --exclude='storage/logs/' \
             --exclude='storage/framework/sessions/' \
