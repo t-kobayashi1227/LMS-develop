@@ -344,6 +344,7 @@ WHERE a.course_id = :course_id AND a.deleted_at IS NULL;
 | options | JSON | NULLABLE | choice型: `["選択肢1", "選択肢2", "選択肢3"]` |
 | correct_option_index | SMALLINT UNSIGNED | NULLABLE | choice型: 正解のインデックス（0始まり） |
 | conditions | JSON | NULLABLE | text型: 表示条件 `["ターゲット：新入社員", ...]` |
+| explanation | TEXT | NULLABLE | 解説・模範解答。送信後に受講生へ表示 |
 | sort_order | SMALLINT UNSIGNED | NOT NULL, DEFAULT 0 | |
 | created_at | TIMESTAMP | NOT NULL, DEFAULT CURRENT_TIMESTAMP | |
 | updated_at | TIMESTAMP | NOT NULL, DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP | |
@@ -762,3 +763,5 @@ DBスキーマとフロントエンドの型は1:1対応しない。Laravel の 
 | `MonthlyData` | activity_logs (集計) | DATE_FORMAT + COUNT DISTINCT で導出 |
 | `CoursePerformance` | courses + enrollments + course_ratings (集計) | 集計クエリで導出 |
 | `RecentActivity` | activity_logs | `type` は4値のみ返す（フロント ActivityType と一致） |
+| `QuizQuestion` | quiz_questions | `explanation` はレッスン詳細（送信前）では返さず、クイズ送信後のレスポンスでのみ返す |
+| `QuizResult` | quiz_questions + quiz_answers | クイズ送信レスポンス専用。選択式: `isCorrect`, `correctOptionIndex` を含む |

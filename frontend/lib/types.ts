@@ -55,7 +55,16 @@ export interface QuizQuestion {
   questionText: string;
   options: string[] | null;
   conditions: string[] | null;
+  explanation?: string | null;
   sortOrder: number;
+}
+
+export interface QuizResult {
+  questionId: string;
+  type: 'choice' | 'text';
+  explanation: string | null;
+  isCorrect?: boolean;
+  correctOptionIndex?: number;
 }
 
 export interface LessonDetail {

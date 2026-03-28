@@ -6,11 +6,12 @@ import { ArrowLeft, Save, Plus, Trash2, ChevronDown, ChevronUp, GripVertical, Vi
 
 interface QuizQuestion {
   id: string;
-  type: string;
+  type: 'choice' | 'text';
   questionText: string;
   options: string[] | null;
   correctOptionIndex: number | null;
   conditions: string[] | null;
+  explanation: string | null;
 }
 
 interface LessonData {
@@ -192,10 +193,28 @@ export default function CourseEditor({ course: initial }: Props) {
             options: ['選択肢1', '選択肢2', '選択肢3'],
             correctOptionIndex: 0,
             conditions: null,
+            explanation: null,
           }],
         } : l),
       })),
     }));
+  };
+
+  const updateQuizLocal = useCallback((quizId: string, updates: Partial<QuizQuestion>) => {
+    setCourse(prev => ({
+      ...prev,
+      chapters: prev.chapters.map(ch => ({
+        ...ch,
+        lessons: ch.lessons.map(l => ({
+          ...l,
+          quizQuestions: l.quizQuestions.map(q => q.id === quizId ? { ...q, ...updates } : q),
+        })),
+      })),
+    }));
+  }, []);
+
+  const saveQuiz = async (quizId: string, updates: Record<string, unknown>) => {
+    await apiCall(`quiz/${quizId}`, 'PUT', updates);
   };
 
   const deleteQuiz = async (quizId: string) => {
@@ -391,14 +410,27 @@ export default function CourseEditor({ course: initial }: Props) {
                             </button>
                           </div>
                           {lesson.quizQuestions.map((q) => (
-                            <div key={q.id} className="flex items-start gap-2 bg-white p-3 rounded-lg border border-outline-variant/20 mb-2">
-                              <span className="text-[10px] bg-tertiary/10 text-tertiary px-1.5 py-0.5 rounded font-bold mt-0.5 shrink-0">
-                                {q.type === 'choice' ? '選択' : '記述'}
-                              </span>
-                              <p className="text-sm text-on-surface flex-1 line-clamp-2">{q.questionText}</p>
-                              <button onClick={() => deleteQuiz(q.id)} className="p-1 text-slate-400 hover:text-red-500 shrink-0" aria-label="問題削除">
-                                <Trash2 size={12} />
-                              </button>
+                            <div key={q.id} className="bg-white p-3 rounded-lg border border-outline-variant/20 mb-2 space-y-2">
+                              <div className="flex items-start gap-2">
+                                <span className="text-[10px] bg-tertiary/10 text-tertiary px-1.5 py-0.5 rounded font-bold mt-0.5 shrink-0">
+                                  {q.type === 'choice' ? '選択' : '記述'}
+                                </span>
+                                <p className="text-sm text-on-surface flex-1 line-clamp-2">{q.questionText}</p>
+                                <button onClick={() => deleteQuiz(q.id)} className="p-1 text-slate-400 hover:text-red-500 shrink-0" aria-label="問題削除">
+                                  <Trash2 size={12} />
+                                </button>
+                              </div>
+                              <div>
+                                <label className="block text-[10px] font-bold text-secondary uppercase tracking-widest mb-1">解説・模範解答</label>
+                                <textarea
+                                  value={q.explanation ?? ''}
+                                  onChange={e => updateQuizLocal(q.id, { explanation: e.target.value || null })}
+                                  onBlur={e => saveQuiz(q.id, { explanation: e.target.value || null })}
+                                  rows={2}
+                                  className="w-full px-2.5 py-1.5 bg-surface-container-low border border-outline-variant/20 rounded-lg text-xs outline-none resize-y"
+                                  placeholder="送信後に受講生へ表示される解説を入力..."
+                                />
+                              </div>
                             </div>
                           ))}
                         </div>
