@@ -13,7 +13,7 @@ return new class extends Migration
             $table->char('uuid', 36)->unique();
             $table->foreignId('user_id')->constrained()->cascadeOnDelete();
             $table->foreignId('course_id')->constrained()->cascadeOnDelete();
-            $table->timestamp('enrolled_at');
+            $table->timestamp('enrolled_at')->useCurrent();
             $table->timestamp('completed_at')->nullable();
             $table->timestamps();
 

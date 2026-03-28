@@ -21,7 +21,7 @@ return new class extends Migration
             $table->foreignId('graded_by')->nullable()->constrained('users')->nullOnDelete();
             $table->timestamp('graded_at')->nullable();
             $table->text('feedback')->nullable();
-            $table->timestamp('submitted_at');
+            $table->timestamp('submitted_at')->useCurrent();
             $table->timestamps();
 
             $table->unique(['assignment_id', 'user_id']);
