@@ -1,5 +1,6 @@
 'use client';
 
+import { useState, useEffect } from 'react';
 import { sanitizeHtml } from '@/lib/sanitize';
 
 interface Props {
@@ -8,10 +9,16 @@ interface Props {
 }
 
 export default function SafeHtml({ html, className }: Props) {
+  const [safeHtml, setSafeHtml] = useState('');
+
+  useEffect(() => {
+    setSafeHtml(sanitizeHtml(html));
+  }, [html]);
+
   return (
     <div
       className={className}
-      dangerouslySetInnerHTML={{ __html: sanitizeHtml(html) }}
+      dangerouslySetInnerHTML={{ __html: safeHtml }}
     />
   );
 }
