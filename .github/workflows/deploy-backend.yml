@@ -1,0 +1,106 @@
+name: Deploy Backend to Xserver
+
+on:
+  push:
+    branches: [main]
+    paths:
+      - 'backend/**'
+      - '.github/workflows/deploy-backend.yml'
+  workflow_dispatch:
+
+concurrency:
+  group: deploy-backend
+  cancel-in-progress: false
+
+jobs:
+  test:
+    name: Backend Tests
+    runs-on: ubuntu-latest
+    services:
+      mysql:
+        image: mysql:8.0
+        env:
+          MYSQL_ROOT_PASSWORD: root
+          MYSQL_DATABASE: lms_test
+        ports:
+          - 3306:3306
+        options: --health-cmd="mysqladmin ping -h localhost" --health-interval=10s --health-timeout=5s --health-retries=5
+
+    defaults:
+      run:
+        working-directory: backend
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: pdo_mysql, mbstring
+
+      - name: Install dependencies
+        run: composer install --no-interaction --prefer-dist
+
+      - name: Run tests
+        env:
+          DB_CONNECTION: mysql
+          DB_HOST: 127.0.0.1
+          DB_PORT: 3306
+          DB_DATABASE: lms_test
+          DB_USERNAME: root
+          DB_PASSWORD: root
+          APP_KEY: base64:dGVzdGtleWZvcmNpMTIzNDU2Nzg5MDEyMzQ1Njc4OTA=
+        run: php artisan test
+
+  deploy:
+    name: Deploy to Xserver
+    runs-on: ubuntu-latest
+    needs: test
+    environment: production
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup PHP
+        uses: shivammathur/setup-php@v2
+        with:
+          php-version: '8.3'
+          extensions: pdo_mysql, mbstring
+
+      - name: Install dependencies (production)
+        working-directory: backend
+        run: composer install --no-dev --optimize-autoloader --no-interaction --prefer-dist
+
+      - name: Setup SSH key
+        run: |
+          mkdir -p ~/.ssh
+          echo "${{ secrets.XSERVER_SSH_KEY }}" > ~/.ssh/id_rsa
+          chmod 600 ~/.ssh/id_rsa
+          echo "${{ secrets.XSERVER_SSH_KNOWN_HOSTS }}" > ~/.ssh/known_hosts
+
+      - name: Deploy via rsync
+        run: |
+          rsync -azv --delete \
+            --exclude='.env' \
+            --exclude='storage/app/' \
+            --exclude='storage/logs/' \
+            --exclude='storage/framework/sessions/' \
+            --exclude='storage/framework/cache/data/' \
+            --exclude='.git' \
+            --exclude='tests/' \
+            --exclude='docker-compose.yml' \
+            --exclude='Dockerfile' \
+            -e "ssh -p ${{ secrets.XSERVER_SSH_PORT }}" \
+            backend/ \
+            ${{ secrets.XSERVER_SSH_USER }}@${{ secrets.XSERVER_SSH_HOST }}:${{ secrets.XSERVER_DEPLOY_PATH }}/
+
+      - name: Run post-deploy commands
+        run: |
+          ssh -p ${{ secrets.XSERVER_SSH_PORT }} \
+            ${{ secrets.XSERVER_SSH_USER }}@${{ secrets.XSERVER_SSH_HOST }} \
+            "cd ${{ secrets.XSERVER_DEPLOY_PATH }} && \
+             php artisan migrate --force && \
+             php artisan config:cache && \
+             php artisan route:cache && \
+             php artisan view:cache"
