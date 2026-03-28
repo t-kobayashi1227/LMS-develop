@@ -22,7 +22,7 @@ export default function LoginForm({ isAdmin = false }: LoginFormProps) {
       const res = await fetch('/api/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ email, password }),
+        body: JSON.stringify({ email, password, role: isAdmin ? 'admin' : 'student' }),
       });
 
       const data = await res.json();

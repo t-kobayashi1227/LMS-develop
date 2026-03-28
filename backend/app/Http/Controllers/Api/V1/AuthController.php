@@ -18,11 +18,18 @@ class AuthController extends Controller
         $request->validate([
             'email' => 'required|email',
             'password' => 'required',
+            'role' => 'required|string|in:student,admin',
         ]);
 
         $user = User::where('email', $request->email)->first();
 
-        if (!$user || !Hash::check($request->password, $user->password)) {
+        if (!$user || $user->role !== $request->role) {
+            throw ValidationException::withMessages([
+                'email' => ['メールアドレスまたはパスワードが正しくありません。'],
+            ]);
+        }
+
+        if (!Hash::check($request->password, $user->password)) {
             throw ValidationException::withMessages([
                 'email' => ['メールアドレスまたはパスワードが正しくありません。'],
             ]);
