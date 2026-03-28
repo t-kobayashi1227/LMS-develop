@@ -15,10 +15,10 @@ export default async function StudentCourseList() {
         <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 md:gap-8 mb-8 md:mb-12">
           <div>
             <h2 className="text-3xl md:text-6xl font-serif font-bold text-on-surface tracking-tight mb-3 md:mb-4">
-              Courses
+              マイコース
             </h2>
             <p className="text-secondary text-base md:text-lg font-light max-w-md">
-              Explore our curated curriculum designed to elevate your intelligence.
+              受講中のコースを確認し、学習を進めましょう。
             </p>
           </div>
         </div>
