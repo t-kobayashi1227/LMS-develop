@@ -1,113 +1,110 @@
 # Niigata AI Academy LMS
 
-Next.js 15 App Router で構築された学習管理システム（LMS）のフロントエンドです。
-現在はダミーデータで動作しており、バックエンドは Laravel で実装予定です。
+Next.js 15 + Laravel 13 で構築された学習管理システム（LMS）。
 
 ## セットアップ
 
-**前提条件:** Node.js 18+
+**前提条件:** Node.js 20+, Docker
 
 ```bash
+# バックエンド（Docker）
+cd backend
+docker compose up -d
+# 初回のみ: マイグレーション＋シーダーはコンテナ起動時に自動実行
+
+# フロントエンド
+cd frontend
 npm install
 npm run dev
 ```
 
-http://localhost:3000 で起動します。
+- フロントエンド: http://localhost:3000
+- バックエンド API: http://localhost:8000/api/v1
+- ヘルスチェック: http://localhost:8000/api/v1/health
+
+## テストアカウント
+
+| 役割 | メールアドレス | パスワード |
+|------|---------------|-----------|
+| 受講者 | `kenta.tanaka@example.com` | `password` |
+| 管理者 | `yui.sato@example.com` | `password` |
+
+> DB をリセットした場合は `docker compose exec app php artisan migrate:fresh --seed --force` を実行してください。
 
 ## コマンド
+
+### フロントエンド (`frontend/`)
 
 | コマンド | 説明 |
 |---------|------|
 | `npm run dev` | 開発サーバー起動（ポート3000） |
 | `npm run build` | 本番ビルド |
-| `npm run start` | 本番サーバー起動 |
+| `npx tsc --noEmit` | 型チェック |
+| `npx playwright test` | E2Eテスト |
+
+### バックエンド (`backend/`)
+
+| コマンド | 説明 |
+|---------|------|
+| `docker compose up -d` | Docker環境起動 |
+| `docker compose exec app php artisan test` | PHPUnitテスト（28件） |
+| `docker compose exec app php artisan migrate:fresh --seed --force` | DB再構築 |
 
 ## 技術スタック
 
-- **フレームワーク:** Next.js 15 (App Router)
-- **言語:** TypeScript
-- **スタイリング:** Tailwind CSS v4
-- **アイコン:** Lucide React
-- **フォント:** Inter, Plus Jakarta Sans, Noto Sans JP, Noto Serif JP
+| レイヤー | 技術 |
+|---------|------|
+| フロントエンド | Next.js 15 (App Router), TypeScript, Tailwind CSS v4 |
+| バックエンド | Laravel 13, PHP 8.3, Laravel Sanctum |
+| データベース | MySQL 8.0 (Docker) |
+| テスト | PHPUnit, Playwright |
+| CI | GitHub Actions |
 
-## ルーティング構成
+## ルーティング
 
-### 受講者側
+### 受講者
 
 | パス | ページ |
 |------|--------|
 | `/` | ログイン |
-| `/student/dashboard` | ホーム（学習中コース、進捗） |
-| `/student/courses` | マイコース一覧 |
-| `/student/lesson` | レッスン閲覧（動画＋テキスト） |
-| `/student/lesson/quiz` | 理解度チェック＆課題 |
-| `/student/settings` | 設定 |
+| `/student/dashboard` | ダッシュボード |
+| `/student/courses` | マイコース一覧（カテゴリフィルタ付き） |
+| `/student/lesson/{courseId}` | レッスン閲覧 |
+| `/student/lesson/{courseId}/quiz` | 理解度チェック |
+| `/student/settings` | 設定（プロフィール・パスワード変更） |
 
-### 管理者側
+### 管理者
 
 | パス | ページ |
 |------|--------|
 | `/admin` | 管理者ログイン |
-| `/admin/dashboard` | ダッシュボード（KPI、未採点課題） |
+| `/admin/dashboard` | ダッシュボード（KPI・未採点課題） |
 | `/admin/users` | 受講者管理 |
 | `/admin/courses` | コース管理 |
+| `/admin/courses/new` | 新規コース作成 |
+| `/admin/courses/{id}` | コース編集（チャプター・レッスン・クイズ CRUD） |
 | `/admin/analytics` | 分析レポート |
 | `/admin/settings` | 設定 |
 
-## プロジェクト構成
+## 本番デプロイ
 
-```
-app/
-  page.tsx                          # 受講者ログイン
-  layout.tsx                        # ルートレイアウト（フォント設定）
-  globals.css                       # デザイントークン、ユーティリティ
-  admin/
-    page.tsx                        # 管理者ログイン
-    (panel)/                        # DashboardLayout 適用
-      layout.tsx
-      dashboard/page.tsx
-      users/page.tsx
-      courses/page.tsx
-      analytics/page.tsx
-      settings/page.tsx
-  student/
-    lesson/                         # サイドバーなし（全画面レイアウト）
-      page.tsx
-      quiz/page.tsx
-    (panel)/                        # DashboardLayout 適用
-      layout.tsx
-      dashboard/page.tsx
-      courses/page.tsx
-      settings/page.tsx
-components/
-  DashboardLayout.tsx               # サイドバー＋トップバー＋モバイルナビ
-  LoginForm.tsx                     # ログインフォーム（受講者/管理者共用）
-  KPICard.tsx                       # KPI カード
-  ProgressBar.tsx                   # プログレスバー
-lib/
-  types.ts                          # 型定義
-  mockData.ts                       # ダミーデータ
-  api.ts                            # データ取得抽象化レイヤー
-  navigation.ts                     # ナビゲーション設定
+```bash
+# .env に APP_KEY, DB_PASSWORD, MYSQL_ROOT_PASSWORD を設定
+docker compose -f docker-compose.production.yml up -d --build
+
+# 初回のみシーダー実行
+docker exec lms-app php artisan db:seed --force
 ```
 
-## データレイヤー
+## バックアップ
 
-現在は `lib/mockData.ts` のダミーデータを `lib/api.ts` 経由で取得しています。
-Laravel バックエンド接続時は `lib/api.ts` の各関数を API コールに差し替えるだけで移行できます。
+```bash
+# 手動バックアップ
+./scripts/backup-db.sh
 
-## デザインシステム
+# リストア
+./scripts/restore-db.sh backups/lms_backup_YYYYMMDD_HHMMSS.sql.gz
 
-Material Design 3 に準拠した色体系を `globals.css` の `@theme` ブロックで定義しています。
-
-| トークン | 用途 |
-|---------|------|
-| `primary` | メインカラー（#0040a1） |
-| `tertiary` | アクセントカラー（#822800） |
-| `on-surface` | テキスト |
-| `secondary` | サブテキスト |
-| `surface-low` / `surface-high` | 背景バリエーション |
-| `outline-variant` | ボーダー |
-| `error` | エラー表示 |
-
-カスタムユーティリティ: `primary-gradient`, `glass-panel`, `hairline-t`, `hairline-b`, `hide-scrollbar`
+# cron 設定（毎日3時に自動バックアップ）
+0 3 * * * /path/to/scripts/backup-db.sh
+```
