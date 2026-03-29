@@ -17,7 +17,7 @@ class StudentController extends Controller
             ->withCount('enrollments')
             ->get();
 
-        // 各受講者の平均進捗をDB集計で一括取得
+        // 各受講者の平均進捗をDB集計で一括取得（MySQL 5.7互換）
         $progressByUser = DB::table('enrollments as e')
             ->join('chapters as ch', 'ch.course_id', '=', 'e.course_id')
             ->join('lessons as l', function ($join) {
@@ -30,15 +30,15 @@ class StudentController extends Controller
             })
             ->select(
                 'e.user_id',
-                DB::raw('ROUND(AVG(
+                DB::raw('ROUND(
                     COUNT(DISTINCT CASE WHEN lp.completed_at IS NOT NULL THEN lp.lesson_id END) * 100.0
                     / NULLIF(COUNT(DISTINCT l.id), 0)
-                ) OVER (PARTITION BY e.user_id), 0) as avg_progress')
+                , 0) as course_progress')
             )
             ->groupBy('e.user_id', 'e.id')
             ->get()
             ->groupBy('user_id')
-            ->map(fn ($rows) => round($rows->avg('avg_progress')));
+            ->map(fn ($rows) => (int) round($rows->avg('course_progress')));
 
         $students->each(function ($student) use ($progressByUser) {
             $student->avg_progress = $progressByUser[$student->id] ?? 0;
