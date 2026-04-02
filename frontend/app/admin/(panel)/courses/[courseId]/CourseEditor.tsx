@@ -69,6 +69,7 @@ export default function CourseEditor({ course: initial }: Props) {
     initial.chapters[0]?.id ?? null
   );
   const [editingLesson, setEditingLesson] = useState<string | null>(null);
+  const [editingQuiz, setEditingQuiz] = useState<string | null>(null);
   const [uploadingThumbnail, setUploadingThumbnail] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -375,7 +376,7 @@ export default function CourseEditor({ course: initial }: Props) {
                   <div key={lesson.id} className="border-b border-outline-variant/10 last:border-b-0">
                     <div
                       className="flex items-center gap-3 px-5 py-3 pl-10 hover:bg-surface-container-low/30 transition-colors cursor-pointer"
-                      onClick={() => setEditingLesson(editingLesson === lesson.id ? null : lesson.id)}
+                      onClick={() => { setEditingLesson(editingLesson === lesson.id ? null : lesson.id); setEditingQuiz(null); }}
                     >
                       {typeIcon(lesson.type)}
                       <span className="flex-1 text-sm text-on-surface">{lesson.title}</span>
@@ -470,30 +471,183 @@ export default function CourseEditor({ course: initial }: Props) {
                               <Plus size={12} /> 問題を追加
                             </button>
                           </div>
-                          {lesson.quizQuestions.map((q) => (
-                            <div key={q.id} className="bg-white p-3 rounded-lg border border-outline-variant/20 mb-2 space-y-2">
-                              <div className="flex items-start gap-2">
-                                <span className="text-[10px] bg-tertiary/10 text-tertiary px-1.5 py-0.5 rounded font-bold mt-0.5 shrink-0">
+                          {lesson.quizQuestions.map((q, qi) => {
+                            const isExpanded = editingQuiz === q.id;
+                            return (
+                            <div key={q.id} className="bg-white rounded-lg border border-outline-variant/20 mb-2 overflow-hidden">
+                              {/* Collapsed header */}
+                              <div
+                                className="flex items-center gap-2 px-3 py-2.5 cursor-pointer hover:bg-surface-container-low/50 transition-colors"
+                                onClick={() => setEditingQuiz(isExpanded ? null : q.id)}
+                              >
+                                <ChevronDown size={14} className={`text-slate-400 transition-transform ${isExpanded ? 'rotate-180' : ''}`} />
+                                <span className="text-[10px] bg-tertiary/10 text-tertiary px-1.5 py-0.5 rounded font-bold shrink-0">
                                   {q.type === 'choice' ? '選択' : '記述'}
                                 </span>
-                                <p className="text-sm text-on-surface flex-1 line-clamp-2">{q.questionText}</p>
-                                <button onClick={() => deleteQuiz(q.id)} className="p-1 text-slate-400 hover:text-red-500 shrink-0" aria-label="問題削除">
+                                <span className="text-xs text-secondary font-bold shrink-0">Q{qi + 1}</span>
+                                <p className="text-sm text-on-surface flex-1 truncate">{q.questionText}</p>
+                                <button onClick={e => { e.stopPropagation(); deleteQuiz(q.id); }} className="p-1 text-slate-400 hover:text-red-500 shrink-0" aria-label="問題削除">
                                   <Trash2 size={12} />
                                 </button>
                               </div>
-                              <div>
-                                <label className="block text-[10px] font-bold text-secondary uppercase tracking-widest mb-1">解説・模範解答</label>
-                                <textarea
-                                  value={q.explanation ?? ''}
-                                  onChange={e => updateQuizLocal(q.id, { explanation: e.target.value || null })}
-                                  onBlur={e => saveQuiz(q.id, { explanation: e.target.value || null })}
-                                  rows={2}
-                                  className="w-full px-2.5 py-1.5 bg-surface-container-low border border-outline-variant/20 rounded-lg text-xs outline-none resize-y"
-                                  placeholder="送信後に受講生へ表示される解説を入力..."
-                                />
-                              </div>
+
+                              {/* Expanded editor */}
+                              {isExpanded && (
+                                <div className="px-3 pb-3 space-y-3 border-t border-outline-variant/10 pt-3">
+                                  {/* Type + Question text */}
+                                  <div className="flex items-start gap-2">
+                                    <select
+                                      value={q.type}
+                                      onChange={e => {
+                                        const newType = e.target.value as 'choice' | 'text';
+                                        const updates: Partial<QuizQuestion> = { type: newType };
+                                        if (newType === 'choice') {
+                                          updates.options = q.options?.length ? q.options : ['選択肢1', '選択肢2', '選択肢3'];
+                                          updates.correctOptionIndex = q.correctOptionIndex ?? 0;
+                                          updates.conditions = null;
+                                        } else {
+                                          updates.options = null;
+                                          updates.correctOptionIndex = null;
+                                          updates.conditions = q.conditions?.length ? q.conditions : [];
+                                        }
+                                        updateQuizLocal(q.id, updates);
+                                        saveQuiz(q.id, updates);
+                                      }}
+                                      className="px-2 py-1.5 bg-surface-container-low border border-outline-variant/20 rounded-lg text-xs font-bold outline-none shrink-0"
+                                    >
+                                      <option value="choice">選択式</option>
+                                      <option value="text">記述式</option>
+                                    </select>
+                                    <textarea
+                                      value={q.questionText}
+                                      onChange={e => updateQuizLocal(q.id, { questionText: e.target.value })}
+                                      onBlur={() => saveQuiz(q.id, { questionText: q.questionText })}
+                                      rows={2}
+                                      className="flex-1 px-2.5 py-1.5 bg-surface-container-low border border-outline-variant/20 rounded-lg text-sm outline-none resize-y"
+                                      placeholder="問題文を入力..."
+                                    />
+                                  </div>
+
+                                  {/* Choice options */}
+                                  {q.type === 'choice' && q.options && (
+                                    <div className="space-y-1.5">
+                                      <label className="block text-[10px] font-bold text-secondary uppercase tracking-widest">選択肢（●が正解）</label>
+                                      {q.options.map((opt, j) => (
+                                        <div key={j} className="flex items-center gap-2">
+                                          <input
+                                            type="radio"
+                                            name={`correct-${q.id}`}
+                                            checked={q.correctOptionIndex === j}
+                                            onChange={() => {
+                                              updateQuizLocal(q.id, { correctOptionIndex: j });
+                                              saveQuiz(q.id, { correctOptionIndex: j });
+                                            }}
+                                            className="w-3.5 h-3.5 text-primary shrink-0"
+                                          />
+                                          <input
+                                            type="text"
+                                            value={opt}
+                                            onChange={e => {
+                                              const newOpts = [...q.options!];
+                                              newOpts[j] = e.target.value;
+                                              updateQuizLocal(q.id, { options: newOpts });
+                                            }}
+                                            onBlur={() => saveQuiz(q.id, { options: q.options })}
+                                            className="flex-1 px-2.5 py-1.5 bg-surface-container-low border border-outline-variant/20 rounded-lg text-xs outline-none"
+                                            placeholder={`選択肢${j + 1}`}
+                                          />
+                                          {q.options!.length > 2 && (
+                                            <button
+                                              onClick={() => {
+                                                const newOpts = q.options!.filter((_, k) => k !== j);
+                                                const newCorrect = q.correctOptionIndex !== null && q.correctOptionIndex >= j
+                                                  ? Math.max(0, (q.correctOptionIndex === j ? 0 : q.correctOptionIndex - 1))
+                                                  : q.correctOptionIndex;
+                                                updateQuizLocal(q.id, { options: newOpts, correctOptionIndex: newCorrect });
+                                                saveQuiz(q.id, { options: newOpts, correctOptionIndex: newCorrect });
+                                              }}
+                                              className="p-1 text-slate-400 hover:text-red-500"
+                                              aria-label="選択肢を削除"
+                                            >
+                                              <Trash2 size={12} />
+                                            </button>
+                                          )}
+                                        </div>
+                                      ))}
+                                      <button
+                                        onClick={() => {
+                                          const newOpts = [...q.options!, `選択肢${q.options!.length + 1}`];
+                                          updateQuizLocal(q.id, { options: newOpts });
+                                          saveQuiz(q.id, { options: newOpts });
+                                        }}
+                                        className="text-xs text-primary font-bold hover:underline flex items-center gap-1 mt-1"
+                                      >
+                                        <Plus size={10} /> 選択肢を追加
+                                      </button>
+                                    </div>
+                                  )}
+
+                                  {/* Text conditions */}
+                                  {q.type === 'text' && (
+                                    <div className="space-y-1.5">
+                                      <label className="block text-[10px] font-bold text-secondary uppercase tracking-widest">回答条件・ヒント</label>
+                                      {(q.conditions ?? []).map((cond, j) => (
+                                        <div key={j} className="flex items-center gap-2">
+                                          <span className="text-xs text-secondary shrink-0">・</span>
+                                          <input
+                                            type="text"
+                                            value={cond}
+                                            onChange={e => {
+                                              const newConds = [...(q.conditions ?? [])];
+                                              newConds[j] = e.target.value;
+                                              updateQuizLocal(q.id, { conditions: newConds });
+                                            }}
+                                            onBlur={() => saveQuiz(q.id, { conditions: q.conditions })}
+                                            className="flex-1 px-2.5 py-1.5 bg-surface-container-low border border-outline-variant/20 rounded-lg text-xs outline-none"
+                                            placeholder="条件を入力..."
+                                          />
+                                          <button
+                                            onClick={() => {
+                                              const newConds = (q.conditions ?? []).filter((_, k) => k !== j);
+                                              updateQuizLocal(q.id, { conditions: newConds });
+                                              saveQuiz(q.id, { conditions: newConds });
+                                            }}
+                                            className="p-1 text-slate-400 hover:text-red-500"
+                                            aria-label="条件を削除"
+                                          >
+                                            <Trash2 size={12} />
+                                          </button>
+                                        </div>
+                                      ))}
+                                      <button
+                                        onClick={() => {
+                                          const newConds = [...(q.conditions ?? []), ''];
+                                          updateQuizLocal(q.id, { conditions: newConds });
+                                        }}
+                                        className="text-xs text-primary font-bold hover:underline flex items-center gap-1 mt-1"
+                                      >
+                                        <Plus size={10} /> 条件を追加
+                                      </button>
+                                    </div>
+                                  )}
+
+                                  {/* Explanation */}
+                                  <div>
+                                    <label className="block text-[10px] font-bold text-secondary uppercase tracking-widest mb-1">解説・模範解答</label>
+                                    <textarea
+                                      value={q.explanation ?? ''}
+                                      onChange={e => updateQuizLocal(q.id, { explanation: e.target.value || null })}
+                                      onBlur={() => saveQuiz(q.id, { explanation: q.explanation })}
+                                      rows={2}
+                                      className="w-full px-2.5 py-1.5 bg-surface-container-low border border-outline-variant/20 rounded-lg text-xs outline-none resize-y"
+                                      placeholder="送信後に受講生へ表示される解説を入力..."
+                                    />
+                                  </div>
+                                </div>
+                              )}
                             </div>
-                          ))}
+                            );
+                          })}
                         </div>
                       </div>
                     )}
