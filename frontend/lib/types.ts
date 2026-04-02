@@ -7,6 +7,8 @@ export interface User {
   avatar: string;
 }
 
+export type CourseStatus = 'draft' | 'published' | 'archived';
+
 export interface Course {
   id: string;
   title: string;
@@ -17,6 +19,7 @@ export interface Course {
   completedLessons: number;
   category: string;
   studentCount: number;
+  status: CourseStatus;
 }
 
 export interface Lesson {

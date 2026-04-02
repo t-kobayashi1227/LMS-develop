@@ -21,12 +21,13 @@ class CourseResource extends JsonResource
             'description' => $this->description ?? '',
             'thumbnail' => $this->thumbnail_path
                 ? asset('storage/' . $this->thumbnail_path)
-                : 'https://placehold.co/600x400/e2e8f0/475569?text=' . urlencode($this->title),
+                : '/school_img.jpg',
             'progress' => $progress,
             'totalLessons' => $totalLessons,
             'completedLessons' => $completedLessons,
             'category' => $this->category->name ?? '',
             'studentCount' => $this->enrollments_count ?? 0,
+            'status' => $this->status,
         ];
     }
 }

@@ -1,16 +1,15 @@
 import type { Metadata } from 'next';
-import Image from 'next/image';
 import Link from 'next/link';
-import { Plus, ChevronLeft, ChevronRight } from 'lucide-react';
-import { getCourses } from '@/lib/api';
-import CourseRowActions from '@/components/CourseRowActions';
+import { Plus } from 'lucide-react';
+import { getAdminCourses } from '@/lib/api';
+import AdminCourseTable from '@/components/AdminCourseTable';
 
 export const metadata: Metadata = {
   title: 'コース管理 | 管理者 | Niigata AI Academy',
 };
 
 export default async function AdminCourseList() {
-  const courses = await getCourses();
+  const courses = await getAdminCourses();
 
   return (
     <div className="animate-in fade-in duration-500 pb-24 overflow-x-hidden">
@@ -34,74 +33,7 @@ export default async function AdminCourseList() {
         </div>
       </div>
 
-      <div className="px-4 md:px-8 max-w-7xl mx-auto">
-        <div className="bg-surface-low rounded-3xl border border-outline-variant/30 overflow-hidden">
-          <div className="overflow-x-auto">
-            <table className="w-full text-left border-collapse">
-              <thead>
-                <tr className="border-b border-outline-variant/30 bg-surface-container-low">
-                  <th className="px-6 py-4 text-xs font-bold text-secondary uppercase tracking-widest whitespace-nowrap">コース情報</th>
-                  <th className="px-6 py-4 text-xs font-bold text-secondary uppercase tracking-widest whitespace-nowrap">カテゴリ</th>
-                  <th className="px-6 py-4 text-xs font-bold text-secondary uppercase tracking-widest whitespace-nowrap">レッスン数</th>
-                  <th className="px-6 py-4 text-xs font-bold text-secondary uppercase tracking-widest whitespace-nowrap">受講者数</th>
-                  <th className="px-6 py-4 text-xs font-bold text-secondary uppercase tracking-widest whitespace-nowrap">公開状態</th>
-                  <th className="px-6 py-4 text-xs font-bold text-secondary uppercase tracking-widest whitespace-nowrap text-right">アクション</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-outline-variant/30">
-                {courses.map((course) => (
-                  <tr key={course.id} className="hover:bg-surface-container-low/50 transition-colors group">
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center gap-4">
-                        <Image src={course.thumbnail} alt={course.title} width={64} height={48} className="rounded-lg object-cover" />
-                        <div>
-                          <div className="font-bold text-on-surface max-w-[200px] truncate">{course.title}</div>
-                          <div className="text-xs text-secondary max-w-[200px] truncate">{course.description}</div>
-                        </div>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="px-3 py-1 bg-surface-container-high text-on-surface text-[10px] font-bold rounded-full uppercase tracking-widest">
-                        {course.category}
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-on-surface font-mono">
-                      {course.totalLessons}
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <div className="flex items-center gap-2">
-                        <span className="text-sm font-bold text-on-surface font-mono">{course.studentCount}</span>
-                        <span className="text-xs text-secondary">名</span>
-                      </div>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap">
-                      <span className="px-3 py-1 text-[10px] font-bold uppercase tracking-widest rounded-full bg-green-500/10 text-green-600">
-                        公開中
-                      </span>
-                    </td>
-                    <td className="px-6 py-4 whitespace-nowrap text-right">
-                      <CourseRowActions courseId={course.id} />
-                    </td>
-                  </tr>
-                ))}
-              </tbody>
-            </table>
-          </div>
-          <div className="px-6 py-4 border-t border-outline-variant/30 flex items-center justify-between">
-            <div className="text-sm text-secondary">
-              全 {courses.length} 件中 1 - {courses.length} 件を表示
-            </div>
-            <div className="flex items-center gap-2">
-              <button disabled className="p-2 rounded-full border border-outline-variant/30 text-secondary transition-colors disabled:opacity-50" aria-label="前のページ">
-                <ChevronLeft size={16} />
-              </button>
-              <button disabled className="p-2 rounded-full border border-outline-variant/30 text-secondary transition-colors disabled:opacity-50" aria-label="次のページ">
-                <ChevronRight size={16} />
-              </button>
-            </div>
-          </div>
-        </div>
-      </div>
+      <AdminCourseTable courses={courses} />
     </div>
   );
 }

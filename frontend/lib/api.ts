@@ -6,6 +6,7 @@ import type {
 } from './types';
 
 export const getCourses = () => fetchData<Course[]>('/courses');
+export const getAdminCourses = () => fetchData<Course[]>('/admin/courses');
 export const getStudents = () => fetchData<Student[]>('/students');
 export const getAssignments = () => fetchData<Assignment[]>('/assignments');
 export const getCurrentUser = () => fetchData<User>('/user');
