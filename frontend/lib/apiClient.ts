@@ -8,8 +8,12 @@ export async function getToken(): Promise<string | undefined> {
 }
 
 async function clearToken() {
-  const cookieStore = await cookies();
-  cookieStore.delete('auth_token');
+  try {
+    const cookieStore = await cookies();
+    cookieStore.delete('auth_token');
+  } catch {
+    // cookies().delete() is only allowed in Server Actions / Route Handlers
+  }
 }
 
 export async function apiFetch<T>(
