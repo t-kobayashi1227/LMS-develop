@@ -70,9 +70,7 @@ class AdminCourseController extends Controller
                 'description' => $course->description,
                 'status' => $course->status,
                 'categoryId' => $course->course_category_id,
-                'thumbnail' => $course->thumbnail_path
-                    ? asset('storage/' . $course->thumbnail_path)
-                    : '/school_img.jpg',
+                'thumbnail' => $course->thumbnail_url,
                 'categoryName' => $course->category->name ?? '',
                 'totalLessons' => $course->lessons_count,
                 'studentCount' => $course->enrollments_count,
@@ -145,7 +143,6 @@ class AdminCourseController extends Controller
             'thumbnail' => 'required|image|mimes:jpg,jpeg,png,webp|max:5120',
         ]);
 
-        // Delete old thumbnail if exists
         if ($course->thumbnail_path) {
             Storage::disk('public')->delete($course->thumbnail_path);
         }

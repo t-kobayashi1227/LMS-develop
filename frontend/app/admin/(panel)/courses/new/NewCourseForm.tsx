@@ -34,6 +34,9 @@ export default function NewCourseForm() {
   const handleThumbnailSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
+    if (thumbnailPreview.startsWith('blob:')) {
+      URL.revokeObjectURL(thumbnailPreview);
+    }
     setThumbnailFile(file);
     setThumbnailPreview(URL.createObjectURL(file));
   };

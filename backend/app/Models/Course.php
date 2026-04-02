@@ -26,6 +26,13 @@ class Course extends Model
         ];
     }
 
+    public function getThumbnailUrlAttribute(): string
+    {
+        return $this->thumbnail_path
+            ? asset('storage/' . $this->thumbnail_path)
+            : '/school_img.jpg';
+    }
+
     public function category(): BelongsTo
     {
         return $this->belongsTo(CourseCategory::class, 'course_category_id');

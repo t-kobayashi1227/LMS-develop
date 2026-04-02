@@ -23,7 +23,7 @@ async function proxyRequest(request: Request, params: Promise<{ path: string[] }
   if (['POST', 'PUT', 'PATCH'].includes(request.method)) {
     const contentType = request.headers.get('content-type') || '';
     if (contentType.includes('multipart/form-data')) {
-      // Forward multipart as-is (don't set Content-Type — fetch will set boundary)
+      // Forward multipart with original Content-Type (includes boundary)
       init.body = await request.arrayBuffer();
       headers['Content-Type'] = contentType;
     } else {

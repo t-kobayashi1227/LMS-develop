@@ -19,9 +19,7 @@ class CourseResource extends JsonResource
             'id' => $this->uuid,
             'title' => $this->title,
             'description' => $this->description ?? '',
-            'thumbnail' => $this->thumbnail_path
-                ? asset('storage/' . $this->thumbnail_path)
-                : '/school_img.jpg',
+            'thumbnail' => $this->thumbnail_url,
             'progress' => $progress,
             'totalLessons' => $totalLessons,
             'completedLessons' => $completedLessons,

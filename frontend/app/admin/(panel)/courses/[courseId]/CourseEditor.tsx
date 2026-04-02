@@ -69,7 +69,6 @@ export default function CourseEditor({ course: initial }: Props) {
     initial.chapters[0]?.id ?? null
   );
   const [editingLesson, setEditingLesson] = useState<string | null>(null);
-  const [thumbnail, setThumbnail] = useState<string>(initial.thumbnail || '/school_img.jpg');
   const [uploadingThumbnail, setUploadingThumbnail] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
 
@@ -86,7 +85,7 @@ export default function CourseEditor({ course: initial }: Props) {
       });
       if (!res.ok) throw new Error();
       const data = await res.json();
-      setThumbnail(data.data.thumbnail);
+      setCourse(prev => ({ ...prev, thumbnail: data.data.thumbnail }));
       setMessage('サムネイルを更新しました');
       setTimeout(() => setMessage(''), 3000);
     } catch {
@@ -317,12 +316,12 @@ export default function CourseEditor({ course: initial }: Props) {
         <div className="mt-6 flex items-start gap-6">
           <div className="relative w-40 h-28 rounded-xl overflow-hidden border border-outline-variant/20 bg-surface-container-low shrink-0">
             <Image
-              src={thumbnail}
+              src={course.thumbnail || '/school_img.jpg'}
               alt="コースサムネイル"
               fill
               className="object-cover"
               sizes="160px"
-              unoptimized={thumbnail.startsWith('http://localhost')}
+              unoptimized={course.thumbnail?.startsWith('http://localhost') ?? false}
             />
           </div>
           <div className="flex flex-col gap-2">

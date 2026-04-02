@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useMemo } from 'react';
 import Image from 'next/image';
 import { ChevronLeft, ChevronRight } from 'lucide-react';
 import type { Course, CourseStatus } from '@/lib/types';
@@ -21,6 +21,12 @@ interface Props {
 export default function AdminCourseTable({ courses }: Props) {
   const [filter, setFilter] = useState<'all' | CourseStatus>('all');
 
+  const counts = useMemo(() => {
+    const c: Record<string, number> = { all: courses.length };
+    for (const course of courses) c[course.status] = (c[course.status] ?? 0) + 1;
+    return c;
+  }, [courses]);
+
   const filtered = filter === 'all'
     ? courses
     : courses.filter((c) => c.status === filter);
@@ -29,9 +35,7 @@ export default function AdminCourseTable({ courses }: Props) {
     <>
       <div className="flex items-center gap-2 px-4 md:px-8 max-w-7xl mx-auto mb-4">
         {filterTabs.map((tab) => {
-          const count = tab.value === 'all'
-            ? courses.length
-            : courses.filter((c) => c.status === tab.value).length;
+          const count = counts[tab.value] ?? 0;
           const active = filter === tab.value;
           return (
             <button
