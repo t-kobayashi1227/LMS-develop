@@ -49,6 +49,7 @@ Route::prefix('v1')->group(function () {
             Route::get('/admin/courses/{uuid}', [AdminCourseController::class, 'show']);
             Route::put('/admin/courses/{uuid}', [AdminCourseController::class, 'update']);
             Route::delete('/admin/courses/{uuid}', [AdminCourseController::class, 'destroy']);
+            Route::post('/admin/courses/{uuid}/thumbnail', [AdminCourseController::class, 'uploadThumbnail']);
 
             // Chapter CRUD
             Route::post('/admin/courses/{courseUuid}/chapters', [AdminCourseController::class, 'storeChapter']);

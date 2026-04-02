@@ -87,6 +87,6 @@ class CourseApiTest extends TestCase
         $response = $this->actingAs($user)->getJson('/api/v1/courses');
 
         $thumbnail = $response->json('data.0.thumbnail');
-        $this->assertStringContainsString('placehold.co', $thumbnail);
+        $this->assertEquals('/school_img.jpg', $thumbnail);
     }
 }

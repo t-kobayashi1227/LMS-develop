@@ -12,6 +12,7 @@ use App\Models\QuizQuestion;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
+use Illuminate\Support\Facades\Storage;
 use Illuminate\Support\Str;
 
 class AdminCourseController extends Controller
@@ -69,6 +70,9 @@ class AdminCourseController extends Controller
                 'description' => $course->description,
                 'status' => $course->status,
                 'categoryId' => $course->course_category_id,
+                'thumbnail' => $course->thumbnail_path
+                    ? asset('storage/' . $course->thumbnail_path)
+                    : '/school_img.jpg',
                 'categoryName' => $course->category->name ?? '',
                 'totalLessons' => $course->lessons_count,
                 'studentCount' => $course->enrollments_count,
@@ -131,6 +135,29 @@ class AdminCourseController extends Controller
         $course->delete();
 
         return response()->json(['data' => ['status' => 'deleted']]);
+    }
+
+    public function uploadThumbnail(Request $request, string $uuid): JsonResponse
+    {
+        $course = Course::where('uuid', $uuid)->firstOrFail();
+
+        $request->validate([
+            'thumbnail' => 'required|image|mimes:jpg,jpeg,png,webp|max:5120',
+        ]);
+
+        // Delete old thumbnail if exists
+        if ($course->thumbnail_path) {
+            Storage::disk('public')->delete($course->thumbnail_path);
+        }
+
+        $path = $request->file('thumbnail')->store('thumbnails', 'public');
+        $course->update(['thumbnail_path' => $path]);
+
+        return response()->json([
+            'data' => [
+                'thumbnail' => asset('storage/' . $path),
+            ],
+        ]);
     }
 
     // ── チャプター ──────────────────────────────────

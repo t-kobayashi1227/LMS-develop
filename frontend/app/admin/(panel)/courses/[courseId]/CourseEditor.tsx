@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useRef } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Save, Plus, Trash2, ChevronDown, ChevronUp, GripVertical, Video, FileText, ClipboardList, HelpCircle } from 'lucide-react';
+import Image from 'next/image';
+import { ArrowLeft, Save, Plus, Trash2, ChevronDown, ChevronUp, GripVertical, Video, FileText, ClipboardList, HelpCircle, ImageIcon } from 'lucide-react';
 
 interface QuizQuestion {
   id: string;
@@ -37,6 +38,7 @@ interface CourseData {
   id: string;
   title: string;
   description: string | null;
+  thumbnail: string | null;
   status: string;
   categoryId: number;
   chapters: ChapterData[];
@@ -67,6 +69,33 @@ export default function CourseEditor({ course: initial }: Props) {
     initial.chapters[0]?.id ?? null
   );
   const [editingLesson, setEditingLesson] = useState<string | null>(null);
+  const [thumbnail, setThumbnail] = useState<string>(initial.thumbnail || '/school_img.jpg');
+  const [uploadingThumbnail, setUploadingThumbnail] = useState(false);
+  const fileInputRef = useRef<HTMLInputElement>(null);
+
+  const handleThumbnailUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setUploadingThumbnail(true);
+    try {
+      const formData = new FormData();
+      formData.append('thumbnail', file);
+      const res = await fetch(`/api/admin/courses/${course.id}/thumbnail`, {
+        method: 'POST',
+        body: formData,
+      });
+      if (!res.ok) throw new Error();
+      const data = await res.json();
+      setThumbnail(data.data.thumbnail);
+      setMessage('サムネイルを更新しました');
+      setTimeout(() => setMessage(''), 3000);
+    } catch {
+      setMessage('サムネイルのアップロードに失敗しました');
+    } finally {
+      setUploadingThumbnail(false);
+      if (fileInputRef.current) fileInputRef.current.value = '';
+    }
+  };
 
   // ── State update helpers ──────────────────────────
   const updateLessonLocal = useCallback((lessonId: string, updates: Partial<LessonData>) => {
@@ -283,6 +312,39 @@ export default function CourseEditor({ course: initial }: Props) {
           className="w-full mt-4 text-secondary bg-transparent border-none outline-none resize-none text-base"
           placeholder="コースの説明文..."
         />
+
+        {/* Thumbnail */}
+        <div className="mt-6 flex items-start gap-6">
+          <div className="relative w-40 h-28 rounded-xl overflow-hidden border border-outline-variant/20 bg-surface-container-low shrink-0">
+            <Image
+              src={thumbnail}
+              alt="コースサムネイル"
+              fill
+              className="object-cover"
+              sizes="160px"
+              unoptimized={thumbnail.startsWith('http://localhost')}
+            />
+          </div>
+          <div className="flex flex-col gap-2">
+            <label className="block text-xs font-bold text-secondary uppercase tracking-widest">サムネイル画像</label>
+            <p className="text-xs text-secondary">推奨: 600×400px / JPG, PNG, WebP / 最大5MB</p>
+            <input
+              ref={fileInputRef}
+              type="file"
+              accept="image/jpeg,image/png,image/webp"
+              onChange={handleThumbnailUpload}
+              className="hidden"
+            />
+            <button
+              onClick={() => fileInputRef.current?.click()}
+              disabled={uploadingThumbnail}
+              className="inline-flex items-center gap-2 px-4 py-2 bg-surface-low border border-outline-variant/30 rounded-xl text-sm font-medium hover:bg-surface-container-low transition-colors disabled:opacity-50 w-fit"
+            >
+              <ImageIcon size={14} />
+              {uploadingThumbnail ? 'アップロード中...' : '画像を変更'}
+            </button>
+          </div>
+        </div>
       </div>
 
       <div className="px-4 md:px-8 max-w-5xl mx-auto space-y-4">

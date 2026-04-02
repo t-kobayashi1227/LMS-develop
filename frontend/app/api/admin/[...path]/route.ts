@@ -21,8 +21,15 @@ async function proxyRequest(request: Request, params: Promise<{ path: string[] }
   const init: RequestInit = { method: request.method, headers };
 
   if (['POST', 'PUT', 'PATCH'].includes(request.method)) {
-    headers['Content-Type'] = 'application/json';
-    init.body = await request.text();
+    const contentType = request.headers.get('content-type') || '';
+    if (contentType.includes('multipart/form-data')) {
+      // Forward multipart as-is (don't set Content-Type — fetch will set boundary)
+      init.body = await request.arrayBuffer();
+      headers['Content-Type'] = contentType;
+    } else {
+      headers['Content-Type'] = 'application/json';
+      init.body = await request.text();
+    }
   }
 
   const res = await fetch(url, init);

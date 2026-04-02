@@ -1,8 +1,9 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import Link from 'next/link';
-import { ArrowLeft, Save } from 'lucide-react';
+import Image from 'next/image';
+import { ArrowLeft, Save, ImageIcon } from 'lucide-react';
 
 interface Category {
   id: number;
@@ -14,8 +15,11 @@ export default function NewCourseForm() {
   const [description, setDescription] = useState('');
   const [categoryId, setCategoryId] = useState('');
   const [dbCategories, setDbCategories] = useState<Category[]>([]);
+  const [thumbnailFile, setThumbnailFile] = useState<File | null>(null);
+  const [thumbnailPreview, setThumbnailPreview] = useState<string>('/school_img.jpg');
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState('');
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
     fetch('/api/admin/categories')
@@ -26,6 +30,13 @@ export default function NewCourseForm() {
       })
       .catch(() => {});
   }, []);
+
+  const handleThumbnailSelect = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    setThumbnailFile(file);
+    setThumbnailPreview(URL.createObjectURL(file));
+  };
 
   const handleCreate = async () => {
     if (!title.trim()) {
@@ -58,7 +69,19 @@ export default function NewCourseForm() {
       }
 
       const data = await res.json();
-      window.location.href = `/admin/courses/${data.data.id}`;
+      const courseId = data.data.id;
+
+      // Upload thumbnail if selected
+      if (thumbnailFile) {
+        const formData = new FormData();
+        formData.append('thumbnail', thumbnailFile);
+        await fetch(`/api/admin/courses/${courseId}/thumbnail`, {
+          method: 'POST',
+          body: formData,
+        }).catch(() => {});
+      }
+
+      window.location.href = `/admin/courses/${courseId}`;
     } catch {
       setError('サーバーに接続できません');
     } finally {
@@ -117,6 +140,33 @@ export default function NewCourseForm() {
               className="w-full px-4 py-3 bg-surface-low border border-outline-variant/30 rounded-xl text-sm outline-none focus:border-primary transition-colors resize-none"
               placeholder="コースの概要を入力..."
             />
+          </div>
+
+          <div>
+            <label className="block text-xs font-bold text-secondary uppercase tracking-widest mb-2">サムネイル画像</label>
+            <div className="flex items-start gap-4">
+              <div className="relative w-36 h-24 rounded-xl overflow-hidden border border-outline-variant/20 bg-surface-container-low shrink-0">
+                <Image src={thumbnailPreview} alt="サムネイルプレビュー" fill className="object-cover" sizes="144px" />
+              </div>
+              <div className="flex flex-col gap-2">
+                <p className="text-xs text-secondary">推奨: 600×400px / JPG, PNG, WebP / 最大5MB</p>
+                <input
+                  ref={fileInputRef}
+                  type="file"
+                  accept="image/jpeg,image/png,image/webp"
+                  onChange={handleThumbnailSelect}
+                  className="hidden"
+                />
+                <button
+                  type="button"
+                  onClick={() => fileInputRef.current?.click()}
+                  className="inline-flex items-center gap-2 px-4 py-2 bg-surface-low border border-outline-variant/30 rounded-xl text-sm font-medium hover:bg-surface-container-low transition-colors w-fit"
+                >
+                  <ImageIcon size={14} />
+                  画像を選択
+                </button>
+              </div>
+            </div>
           </div>
 
           <div className="flex justify-end">
