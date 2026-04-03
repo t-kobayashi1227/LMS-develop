@@ -11,15 +11,15 @@
   - `GET/POST/DELETE /admin/courses/{uuid}/enrollments`
   - コース編集画面に受講生一覧 + 追加モーダル
 
-- [ ] **課題提出（Assignment Submission）**
-  - 受講生が課題を提出できるAPI + UI
-  - `POST /lessons/{uuid}/assignment-submission`（テキスト + ファイルアップロード）
-  - 受講生の課題一覧ページ
+- [x] **課題提出（Assignment Submission）** — 2026-04-03
+  - `POST /assignments/{uuid}/submit`（テキスト + ファイルアップロード）
+  - レッスンビュー内に課題提出フォーム表示
+  - 提出済み/採点済みステータス表示
 
-- [ ] **課題採点・フィードバック（Admin Grading）**
-  - 管理者が提出物を閲覧・採点・フィードバックできるUI
-  - `PUT /admin/submissions/{uuid}` でスコア・フィードバック保存
-  - 管理ダッシュボードの未採点一覧からアクション可能に
+- [x] **課題採点・フィードバック（Admin Grading）** — 2026-04-03
+  - `GET /admin/submissions/{uuid}` + `PUT /admin/submissions/{uuid}/grade`
+  - 管理者採点ページ（スコア + フィードバック）
+  - ダッシュボードの未採点一覧から採点ページへリンク
 
 ## 優先度：中（運用に必要）
 

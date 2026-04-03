@@ -36,6 +36,31 @@ class LessonDetailResource extends JsonResource
                 'url' => $r->file_path,
             ]),
             'quizQuestions' => $locked ? [] : QuizQuestionResource::collection($this->quizQuestions),
+            'assignment' => $locked ? null : $this->whenLoaded('assignment', function () {
+                $assignment = $this->assignment;
+                if (!$assignment) return null;
+                return [
+                    'id' => $assignment->uuid,
+                    'title' => $assignment->title,
+                    'description' => $assignment->description,
+                    'dueDate' => $assignment->due_date?->toIso8601String(),
+                    'maxScore' => $assignment->max_score,
+                ];
+            }),
+            'submission' => $locked ? null : $this->whenLoaded('assignment', function () {
+                $submission = $this->submission_data;
+                if (!$submission) return null;
+                return [
+                    'id' => $submission->uuid,
+                    'content' => $submission->content,
+                    'fileName' => $submission->file_original_name,
+                    'status' => $submission->status,
+                    'score' => $submission->score,
+                    'feedback' => $submission->feedback,
+                    'submittedAt' => $submission->submitted_at?->toIso8601String(),
+                    'gradedAt' => $submission->graded_at?->toIso8601String(),
+                ];
+            }),
         ];
     }
 }

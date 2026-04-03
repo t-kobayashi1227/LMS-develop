@@ -88,6 +88,23 @@ export interface LessonDetail {
   sortOrder: number;
   resources: { id: string; title: string; fileOriginalName: string; fileSizeBytes: number | null; mimeType: string | null; url: string | null }[];
   quizQuestions: QuizQuestion[];
+  assignment?: {
+    id: string;
+    title: string;
+    description: string | null;
+    dueDate: string | null;
+    maxScore: number | null;
+  } | null;
+  submission?: {
+    id: string;
+    content: string | null;
+    fileName: string | null;
+    status: 'submitted' | 'graded';
+    score: number | null;
+    feedback: string | null;
+    submittedAt: string | null;
+    gradedAt: string | null;
+  } | null;
 }
 
 export interface Assignment {

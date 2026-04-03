@@ -1,5 +1,6 @@
 import type { Metadata } from 'next';
 import Image from 'next/image';
+import Link from 'next/link';
 import { Users, BookOpen, CheckCircle, Clock, ArrowRight } from 'lucide-react';
 import { getCourses, getAdminKpi, getPendingSubmissions } from '@/lib/api';
 import KPICard from '@/components/KPICard';
@@ -43,7 +44,7 @@ export default async function AdminDashboard() {
               <div className="p-6 text-center text-secondary text-sm">未採点の課題はありません</div>
             ) : (
               submissions.map((s) => (
-                <div key={s.id} className="p-4 md:p-6 hover:bg-surface-container-low transition-colors flex items-center justify-between group cursor-pointer">
+                <Link key={s.id} href={`/admin/submissions/${s.id}`} className="block p-4 md:p-6 hover:bg-surface-container-low transition-colors flex items-center justify-between group">
                   <div className="flex items-center gap-3 md:gap-4">
                     <Image src={s.studentAvatar} alt={s.studentName} width={40} height={40} className="rounded-full object-cover" />
                     <div>
@@ -54,7 +55,7 @@ export default async function AdminDashboard() {
                   <div className="w-8 h-8 rounded-full bg-surface-container-high flex items-center justify-center text-secondary group-hover:bg-primary group-hover:text-white transition-colors">
                     <ArrowRight size={16} />
                   </div>
-                </div>
+                </Link>
               ))
             )}
           </div>

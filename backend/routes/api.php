@@ -31,6 +31,7 @@ Route::prefix('v1')->group(function () {
         Route::post('/lessons/{lessonUuid}/progress', [LessonController::class, 'updateProgress']);
         Route::post('/lessons/{lessonUuid}/quiz-answers', [LessonController::class, 'submitQuizAnswers']);
         Route::get('/assignments', [AssignmentController::class, 'index']);
+        Route::post('/assignments/{uuid}/submit', [AssignmentController::class, 'submit']);
 
         // Admin only
         Route::middleware(EnsureAdmin::class)->group(function () {
@@ -42,6 +43,8 @@ Route::prefix('v1')->group(function () {
             Route::get('/analytics/course-performance', [AnalyticsController::class, 'coursePerformance']);
             Route::get('/analytics/recent-activity', [AnalyticsController::class, 'recentActivity']);
             Route::get('/analytics/pending-submissions', [AnalyticsController::class, 'pendingSubmissions']);
+            Route::get('/admin/submissions/{uuid}', [AssignmentController::class, 'showSubmission']);
+            Route::put('/admin/submissions/{uuid}/grade', [AssignmentController::class, 'grade']);
 
             // Course CRUD
             Route::get('/admin/categories', [AdminCourseController::class, 'categoriesWithId']);

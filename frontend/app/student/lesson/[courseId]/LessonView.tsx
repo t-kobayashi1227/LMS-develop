@@ -3,7 +3,7 @@
 import { useState, useMemo, useCallback, useEffect, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowLeft, PlayCircle, FileText, CheckCircle2, Lock, Download, Lightbulb, List, ChevronUp } from 'lucide-react';
+import { ArrowLeft, PlayCircle, FileText, CheckCircle2, Lock, Download, Lightbulb, List, ChevronUp, Send, ClipboardList, Upload } from 'lucide-react';
 import type { CourseChapters, Lesson, LessonDetail } from '@/lib/types';
 import SafeHtml from '@/components/SafeHtml';
 
@@ -226,6 +226,21 @@ export default function LessonView({ courseData, initialLessonId, initialLessonD
               </Link>
             )}
 
+            {/* Assignment Submission */}
+            {lessonDetail?.assignment && (
+              <AssignmentSection
+                assignment={lessonDetail.assignment}
+                submission={lessonDetail.submission ?? null}
+                onSubmitted={() => {
+                  // Reload lesson detail
+                  fetch(`/api/lessons/${activeLessonId}`)
+                    .then(r => r.json())
+                    .then(data => setLessonDetail(data.data))
+                    .catch(() => {});
+                }}
+              />
+            )}
+
           </div>
         </div>
 
@@ -302,6 +317,149 @@ export default function LessonView({ courseData, initialLessonId, initialLessonD
           {playlistOpen ? <ChevronUp size={20} /> : <List size={20} />}
         </button>
       </div>
+    </div>
+  );
+}
+
+function AssignmentSection({
+  assignment,
+  submission,
+  onSubmitted,
+}: {
+  assignment: NonNullable<LessonDetail['assignment']>;
+  submission: LessonDetail['submission'] | null;
+  onSubmitted: () => void;
+}) {
+  const [content, setContent] = useState('');
+  const [file, setFile] = useState<File | null>(null);
+  const [submitting, setSubmitting] = useState(false);
+  const [error, setError] = useState('');
+
+  const handleSubmit = async () => {
+    if (!content.trim() && !file) {
+      setError('回答またはファイルを入力してください');
+      return;
+    }
+    setSubmitting(true);
+    setError('');
+
+    const formData = new FormData();
+    if (content.trim()) formData.append('content', content);
+    if (file) formData.append('file', file);
+
+    try {
+      const res = await fetch(`/api/assignments/${assignment.id}/submit`, {
+        method: 'POST',
+        body: formData,
+      });
+      if (!res.ok) {
+        setError('提出に失敗しました');
+        return;
+      }
+      onSubmitted();
+    } catch {
+      setError('サーバーに接続できません');
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  // Already submitted — show status
+  if (submission) {
+    return (
+      <div className="bg-white p-5 md:p-8 rounded-3xl shadow-[0_10px_40px_rgba(0,0,0,0.04)] border border-outline-variant/10 space-y-5 mb-8">
+        <div className="flex items-center gap-3">
+          <ClipboardList size={20} className="text-primary" />
+          <h3 className="text-lg font-bold text-on-surface font-headline">{assignment.title}</h3>
+          <span className={`text-[10px] font-bold uppercase tracking-widest px-2.5 py-0.5 rounded-full ${
+            submission.status === 'graded' ? 'bg-green-500/10 text-green-600' : 'bg-amber-500/10 text-amber-600'
+          }`}>
+            {submission.status === 'graded' ? '採点済み' : '提出済み'}
+          </span>
+        </div>
+
+        {submission.content && (
+          <div className="p-4 bg-surface-container-low rounded-xl">
+            <span className="text-xs font-bold text-secondary uppercase tracking-widest block mb-2">あなたの回答</span>
+            <p className="text-sm text-on-surface whitespace-pre-wrap">{submission.content}</p>
+          </div>
+        )}
+
+        {submission.fileName && (
+          <p className="text-sm text-secondary">提出ファイル: {submission.fileName}</p>
+        )}
+
+        {submission.status === 'graded' && (
+          <>
+            {submission.score !== null && (
+              <div className="flex items-center gap-2">
+                <span className="text-sm font-bold text-on-surface">スコア:</span>
+                <span className="text-lg font-bold text-primary">{submission.score}</span>
+                {assignment.maxScore && <span className="text-sm text-secondary">/ {assignment.maxScore}</span>}
+              </div>
+            )}
+            {submission.feedback && (
+              <div className="p-4 bg-tertiary/5 rounded-xl border border-tertiary/20">
+                <span className="text-xs font-bold text-tertiary uppercase tracking-widest block mb-2">フィードバック</span>
+                <p className="text-sm text-on-surface-variant whitespace-pre-wrap">{submission.feedback}</p>
+              </div>
+            )}
+          </>
+        )}
+      </div>
+    );
+  }
+
+  // Not yet submitted — show form
+  return (
+    <div className="bg-white p-5 md:p-8 rounded-3xl shadow-[0_10px_40px_rgba(0,0,0,0.04)] border border-outline-variant/10 space-y-5 mb-8">
+      <div className="flex items-center gap-3">
+        <ClipboardList size={20} className="text-primary" />
+        <h3 className="text-lg font-bold text-on-surface font-headline">{assignment.title}</h3>
+      </div>
+
+      {assignment.description && (
+        <p className="text-sm text-on-surface-variant leading-relaxed">{assignment.description}</p>
+      )}
+
+      {assignment.dueDate && (
+        <p className="text-xs text-secondary">
+          提出期限: {new Date(assignment.dueDate).toLocaleDateString('ja-JP', { year: 'numeric', month: 'long', day: 'numeric' })}
+        </p>
+      )}
+
+      <div>
+        <label className="block text-xs font-bold text-secondary uppercase tracking-widest mb-2">回答</label>
+        <textarea
+          value={content}
+          onChange={e => setContent(e.target.value)}
+          rows={6}
+          className="w-full p-4 bg-white border border-outline-variant/30 rounded-xl focus:ring-2 focus:ring-primary/20 focus:border-primary transition-all resize-none outline-none text-sm"
+          placeholder="回答を入力..."
+        />
+      </div>
+
+      <div>
+        <label className="block text-xs font-bold text-secondary uppercase tracking-widest mb-2">ファイル添付（任意）</label>
+        <label className="inline-flex items-center gap-2 px-4 py-2 bg-surface-low border border-outline-variant/30 rounded-xl text-sm font-medium hover:bg-surface-container-low transition-colors cursor-pointer">
+          <Upload size={14} />
+          {file ? file.name : 'ファイルを選択'}
+          <input type="file" className="hidden" onChange={e => setFile(e.target.files?.[0] ?? null)} />
+        </label>
+      </div>
+
+      {error && (
+        <div className="p-3 rounded-xl bg-red-50 border border-red-200 text-red-600 text-sm">{error}</div>
+      )}
+
+      <button
+        onClick={handleSubmit}
+        disabled={submitting}
+        className="flex items-center gap-2 px-6 py-3 primary-gradient text-white font-bold rounded-xl shadow-lg shadow-primary/20 hover:shadow-xl transition-all active:scale-95 disabled:opacity-50"
+      >
+        <Send size={16} />
+        {submitting ? '提出中...' : '課題を提出'}
+      </button>
     </div>
   );
 }
