@@ -32,7 +32,7 @@ export default function CourseRowActions({ courseId }: Props) {
 
   return (
     <div className="flex items-center justify-end gap-2 opacity-100 lg:opacity-0 lg:group-hover:opacity-100 transition-opacity">
-      <Link href={`/student/lesson/${courseId}`} className="p-2 text-secondary hover:text-primary transition-colors rounded-full hover:bg-surface-container-high" aria-label="プレビュー">
+      <Link href={`/student/lesson/${courseId}?preview=true`} className="p-2 text-secondary hover:text-primary transition-colors rounded-full hover:bg-surface-container-high" aria-label="プレビュー">
         <Eye size={16} />
       </Link>
       <Link href={`/admin/courses/${courseId}`} className="p-2 text-secondary hover:text-on-surface transition-colors rounded-full hover:bg-surface-container-high" aria-label="編集">

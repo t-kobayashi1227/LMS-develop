@@ -13,13 +13,18 @@ export function middleware(request: NextRequest) {
     return NextResponse.redirect(new URL(loginUrl, request.url));
   }
 
-  // Prevent students from accessing admin pages and vice versa
+  // Prevent students from accessing admin pages
+  // Admins can access /student/lesson/{courseId} for preview (but not /quiz subpath)
   if (token && role) {
     if (pathname.startsWith('/admin') && role !== 'admin') {
       return NextResponse.redirect(new URL('/student/dashboard', request.url));
     }
     if (pathname.startsWith('/student') && role === 'admin') {
-      return NextResponse.redirect(new URL('/admin/dashboard', request.url));
+      const isLessonPreview = /^\/student\/lesson\/[^/]+$/.test(pathname)
+        && request.nextUrl.searchParams.get('preview') === 'true';
+      if (!isLessonPreview) {
+        return NextResponse.redirect(new URL('/admin/dashboard', request.url));
+      }
     }
   }
 

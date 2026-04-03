@@ -8,15 +8,18 @@ import LessonView from './LessonView';
 
 interface Props {
   params: Promise<{ courseId: string }>;
+  searchParams: Promise<{ preview?: string }>;
 }
 
-export default async function LessonPage({ params }: Props) {
+export default async function LessonPage({ params, searchParams }: Props) {
   const { courseId } = await params;
+  const { preview } = await searchParams;
   const [courseData, user] = await Promise.all([
     getCourseChapters(courseId),
     getCurrentUser(),
   ]);
 
+  const isPreview = preview === 'true' && user.role === 'admin';
   const backHref = user.role === 'admin' ? '/admin/courses' : '/student/dashboard';
 
   const allLessons = courseData.chapters.flatMap(ch => ch.lessons);
@@ -31,6 +34,7 @@ export default async function LessonPage({ params }: Props) {
       initialLessonId={activeLessonId}
       initialLessonDetail={initialLesson}
       backHref={backHref}
+      preview={isPreview}
     />
   );
 }

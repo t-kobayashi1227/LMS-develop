@@ -12,9 +12,10 @@ interface LessonViewProps {
   initialLessonId: string;
   initialLessonDetail: LessonDetail | null;
   backHref?: string;
+  preview?: boolean;
 }
 
-export default function LessonView({ courseData, initialLessonId, initialLessonDetail, backHref = '/student/dashboard' }: LessonViewProps) {
+export default function LessonView({ courseData, initialLessonId, initialLessonDetail, backHref = '/student/dashboard', preview = false }: LessonViewProps) {
   const [activeLessonId, setActiveLessonId] = useState(initialLessonId);
   const [lessonDetail, setLessonDetail] = useState<LessonDetail | null>(initialLessonDetail);
   const [detailLoading, setDetailLoading] = useState(false);
@@ -37,7 +38,7 @@ export default function LessonView({ courseData, initialLessonId, initialLessonD
 
   const progressSent = useRef<Set<string>>(new Set());
   useEffect(() => {
-    if (!activeLessonId || progressSent.current.has(activeLessonId)) return;
+    if (preview || !activeLessonId || progressSent.current.has(activeLessonId)) return;
     progressSent.current.add(activeLessonId);
     // テキスト/課題レッスンは閲覧で完了、動画レッスンは started のみ
     const activeLesson = allLessons.find(l => l.id === activeLessonId);
@@ -202,7 +203,7 @@ export default function LessonView({ courseData, initialLessonId, initialLessonD
             )}
 
             {/* 理解度チェック CTA — DB にクイズ問題がある場合のみ表示 */}
-            {hasQuiz && (
+            {hasQuiz && !preview && (
               <Link
                 href={`/student/lesson/${courseData.courseId}/quiz?lessonId=${activeLessonId}`}
                 className="flex items-center justify-between p-5 md:p-8 bg-white rounded-3xl shadow-[0_10px_40px_rgba(0,0,0,0.04)] border border-outline-variant/10 group hover:border-primary/30 transition-colors cursor-pointer mb-8"
@@ -227,7 +228,7 @@ export default function LessonView({ courseData, initialLessonId, initialLessonD
             )}
 
             {/* Assignment Submission */}
-            {lessonDetail?.assignment && (
+            {lessonDetail?.assignment && !preview && (
               <AssignmentSection
                 assignment={lessonDetail.assignment}
                 submission={lessonDetail.submission ?? null}
