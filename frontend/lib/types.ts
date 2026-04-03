@@ -109,6 +109,15 @@ export interface Message {
   type: 'direct' | 'feedback' | 'system';
 }
 
+export interface Enrollment {
+  id: string;
+  studentId: string;
+  studentName: string;
+  studentEmail: string;
+  enrolledAt: string | null;
+  completedAt: string | null;
+}
+
 export interface Student {
   id: string;
   name: string;

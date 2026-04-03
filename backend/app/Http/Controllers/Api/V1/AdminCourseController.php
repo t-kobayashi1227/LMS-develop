@@ -4,11 +4,14 @@ namespace App\Http\Controllers\Api\V1;
 
 use App\Http\Controllers\Controller;
 use App\Http\Resources\CourseResource;
+use App\Http\Resources\EnrollmentResource;
 use App\Models\Chapter;
 use App\Models\Course;
 use App\Models\CourseCategory;
+use App\Models\Enrollment;
 use App\Models\Lesson;
 use App\Models\QuizQuestion;
+use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\AnonymousResourceCollection;
@@ -155,6 +158,55 @@ class AdminCourseController extends Controller
                 'thumbnail' => asset('storage/' . $path),
             ],
         ]);
+    }
+
+    // ── 受講登録 ──────────────────────────────────
+
+    public function enrollments(string $courseUuid): AnonymousResourceCollection
+    {
+        $course = Course::where('uuid', $courseUuid)->firstOrFail();
+
+        $enrollments = Enrollment::where('course_id', $course->id)
+            ->with('user')
+            ->orderByDesc('enrolled_at')
+            ->get();
+
+        return EnrollmentResource::collection($enrollments);
+    }
+
+    public function enroll(Request $request, string $courseUuid): JsonResponse
+    {
+        $course = Course::where('uuid', $courseUuid)->firstOrFail();
+
+        $validated = $request->validate([
+            'studentId' => 'required|string',
+        ]);
+
+        $user = User::where('uuid', $validated['studentId'])
+            ->where('role', 'student')
+            ->firstOrFail();
+
+        $enrollment = Enrollment::firstOrCreate(
+            ['user_id' => $user->id, 'course_id' => $course->id],
+            ['enrolled_at' => now()],
+        );
+
+        return response()->json([
+            'data' => new EnrollmentResource($enrollment->load('user')),
+        ], 201);
+    }
+
+    public function unenroll(string $courseUuid, string $enrollmentUuid): JsonResponse
+    {
+        $course = Course::where('uuid', $courseUuid)->firstOrFail();
+
+        $enrollment = Enrollment::where('uuid', $enrollmentUuid)
+            ->where('course_id', $course->id)
+            ->firstOrFail();
+
+        $enrollment->delete();
+
+        return response()->json(['data' => ['status' => 'deleted']]);
     }
 
     // ── チャプター ──────────────────────────────────

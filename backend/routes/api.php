@@ -35,6 +35,7 @@ Route::prefix('v1')->group(function () {
         // Admin only
         Route::middleware(EnsureAdmin::class)->group(function () {
             Route::get('/students', [StudentController::class, 'index']);
+            Route::get('/admin/students', [StudentController::class, 'index']);
             Route::delete('/students/{uuid}', [StudentController::class, 'destroy']);
             Route::get('/analytics/kpi', [AnalyticsController::class, 'adminKpi']);
             Route::get('/analytics/monthly-students', [AnalyticsController::class, 'monthlyStudents']);
@@ -50,6 +51,11 @@ Route::prefix('v1')->group(function () {
             Route::put('/admin/courses/{uuid}', [AdminCourseController::class, 'update']);
             Route::delete('/admin/courses/{uuid}', [AdminCourseController::class, 'destroy']);
             Route::post('/admin/courses/{uuid}/thumbnail', [AdminCourseController::class, 'uploadThumbnail']);
+
+            // Enrollment management
+            Route::get('/admin/courses/{uuid}/enrollments', [AdminCourseController::class, 'enrollments']);
+            Route::post('/admin/courses/{uuid}/enrollments', [AdminCourseController::class, 'enroll']);
+            Route::delete('/admin/courses/{uuid}/enrollments/{enrollmentUuid}', [AdminCourseController::class, 'unenroll']);
 
             // Chapter CRUD
             Route::post('/admin/courses/{courseUuid}/chapters', [AdminCourseController::class, 'storeChapter']);

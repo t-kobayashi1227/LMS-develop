@@ -93,6 +93,10 @@ ProgressBar.tsx     → プログレスバー（Server Component）
 - 設計書: `frontend/docs/database-schema.md`
 - 16テーブル構成（users, courses, chapters, lessons, enrollments 等）
 
+## TODO
+
+未実装機能の一覧は `frontend/docs/TODO.md` で管理。機能を実装完了したら `[x]` に変更し日付を記載すること。新たな未実装項目が見つかった場合も追記する。
+
 ## Conventions
 
 - ダミーデータ追加時は `lib/types.ts` に型定義 → `lib/mockData.ts` にデータ → `lib/api.ts` に取得関数
