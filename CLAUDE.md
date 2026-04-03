@@ -46,26 +46,33 @@ Niigata AI Academy LMS — モノレポ構成の学習管理システム。フ�
 ### Data Layer
 
 ```
-lib/types.ts    → 型定義（User, Course, Student, etc.）
-lib/mockData.ts → ダミーデータ（全て型付き）
-lib/api.ts      → データ取得抽象化レイヤー（Laravel 移行時はここだけ変更）
+lib/types.ts     → 型定義（User, Course, Student, Enrollment, SubmissionDetail, etc.）
+lib/api.ts       → サーバーサイドデータ取得（fetchData 経由）
+lib/apiClient.ts → 認証トークン管理・API fetch ラッパー
+lib/config.ts    → BACKEND_URL 環境変数
 ```
 
-ページからは `lib/api.ts` 経由でデータ取得。`mockData.ts` を直接 import しない。
+ページからは `lib/api.ts` 経由でデータ取得。クライアントコンポーネントは `/api/*` プロキシルート経由で fetch。
 
 ### Components
 
 ```
-DashboardLayout.tsx → サイドバー + トップバー + モバイルナビ + アバターメニュー ('use client')
-LoginForm.tsx       → ログインフォーム ('use client')
-KPICard.tsx         → KPI カード（Server Component）
-ProgressBar.tsx     → プログレスバー（Server Component）
+DashboardLayout.tsx     → サイドバー + トップバー + モバイルナビ + アバターメニュー ('use client')
+LoginForm.tsx           → ログインフォーム ('use client')
+KPICard.tsx             → KPI カード（Server Component）
+ProgressBar.tsx         → プログレスバー（Server Component）
+AdminCourseTable.tsx    → コース管理テーブル（フィルタ・ページネーション付き）
+AdminUserTable.tsx      → 受講者管理テーブル（検索・ページネーション付き）
+CourseEnrollments.tsx   → 受講生登録管理（追加/削除モーダル付き）
+CourseStatusBadge.tsx   → コースステータスバッジ
+CourseRowActions.tsx    → コーステーブルの操作ボタン
 ```
 
 ### Server / Client Component 方針
 
 - ページは原則 Server Component（metadata export 可能）
-- `'use client'` は状態が必要なページのみ: `admin/users`（検索）、`student/lesson`（プレイリスト開閉）、`student/lesson/quiz`（回答管理）
+- `'use client'` は状態が必要なコンポーネントのみ（テーブル、フォーム、レッスンビューア等）
+- クライアントコンポーネントからのAPI呼び出しは `/api/*` プロキシルート経由（`frontend/app/api/`）
 
 ### Styling
 
@@ -73,7 +80,7 @@ ProgressBar.tsx     → プログレスバー（Server Component）
 - デザイントークン: `app/globals.css` の `@theme` ブロック（MD3 準拠）
 - カスタムユーティリティ: `primary-gradient`, `glass-panel`, `hairline-t`, `hairline-b`, `hide-scrollbar`
 - フォント: `next/font/google` → CSS変数 → Tailwind トークン（`font-headline`, `font-body`, `font-serif`）
-- 画像: `next/image` 使用。外部画像（placehold.co）は `next.config.ts` の `remotePatterns` + `dangerouslyAllowSVG` で許可
+- 画像: `next/image` 使用。外部画像は `next.config.ts` の `remotePatterns` で許可（placehold.co, localhost:8000, api.stage-site.net）
 
 ### Path Alias
 
@@ -85,7 +92,9 @@ ProgressBar.tsx     → プログレスバー（Server Component）
 
 - RESTful JSON API（`/api/v1/` プレフィックス）
 - Laravel API Resource で DTO 変換（DB → フロントエンド型）
-- 認証: Laravel Sanctum
+- 認証: Laravel Sanctum（トークンベース）
+- CORS: `config/cors.php`（`CORS_ALLOWED_ORIGINS` 環境変数で制御）
+- ファイルアップロード: public disk（`storage/app/public/`）→ `php artisan storage:link` で公開
 
 ### Database
 
@@ -99,7 +108,7 @@ ProgressBar.tsx     → プログレスバー（Server Component）
 
 ## Conventions
 
-- ダミーデータ追加時は `lib/types.ts` に型定義 → `lib/mockData.ts` にデータ → `lib/api.ts` に取得関数
+- 新しい型は `lib/types.ts` に定義 → `lib/api.ts` に取得関数を追加
 - ナビ項目追加時は `lib/navigation.ts` を編集
 - アイコンのみのボタンには `aria-label` を付与
 - モバイルでタッチ不可の `hover:opacity` パターンは使わない（`opacity-100 lg:opacity-0 lg:group-hover:opacity-100` で対応）
