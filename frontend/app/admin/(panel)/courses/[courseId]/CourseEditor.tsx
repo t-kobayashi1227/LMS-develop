@@ -273,23 +273,29 @@ export default function CourseEditor({ course: initial }: Props) {
   const uploadResource = async (lessonId: string, file: File) => {
     const formData = new FormData();
     formData.append('file', file);
-    const res = await fetch(`/api/admin/lessons/${lessonId}/resources`, {
-      method: 'POST',
-      body: formData,
-    });
-    if (!res.ok) return;
-    const data = await res.json();
-    const newResource: ResourceData = data.data;
-    setCourse(prev => ({
-      ...prev,
-      chapters: prev.chapters.map(ch => ({
-        ...ch,
-        lessons: ch.lessons.map(l => l.id === lessonId ? {
-          ...l,
-          resources: [...l.resources, newResource],
-        } : l),
-      })),
-    }));
+    try {
+      const res = await fetch(`/api/admin/lessons/${lessonId}/resources`, {
+        method: 'POST',
+        body: formData,
+      });
+      if (!res.ok) throw new Error();
+      const data = await res.json();
+      const newResource: ResourceData = data.data;
+      setCourse(prev => ({
+        ...prev,
+        chapters: prev.chapters.map(ch => ({
+          ...ch,
+          lessons: ch.lessons.map(l => l.id === lessonId ? {
+            ...l,
+            resources: [...l.resources, newResource],
+          } : l),
+        })),
+      }));
+      setMessage('資料をアップロードしました');
+      setTimeout(() => setMessage(''), 3000);
+    } catch {
+      setMessage('資料のアップロードに失敗しました');
+    }
   };
 
   const deleteResource = async (resourceId: string) => {

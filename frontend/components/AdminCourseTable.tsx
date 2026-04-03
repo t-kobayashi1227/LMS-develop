@@ -20,6 +20,8 @@ interface Props {
 
 export default function AdminCourseTable({ courses }: Props) {
   const [filter, setFilter] = useState<'all' | CourseStatus>('all');
+  const [page, setPage] = useState(0);
+  const perPage = 10;
 
   const counts = useMemo(() => {
     const c: Record<string, number> = { all: courses.length };
@@ -31,6 +33,9 @@ export default function AdminCourseTable({ courses }: Props) {
     ? courses
     : courses.filter((c) => c.status === filter);
 
+  const totalPages = Math.ceil(filtered.length / perPage);
+  const paged = filtered.slice(page * perPage, (page + 1) * perPage);
+
   return (
     <>
       <div className="flex items-center gap-2 px-4 md:px-8 max-w-7xl mx-auto mb-4">
@@ -40,7 +45,7 @@ export default function AdminCourseTable({ courses }: Props) {
           return (
             <button
               key={tab.value}
-              onClick={() => setFilter(tab.value)}
+              onClick={() => { setFilter(tab.value); setPage(0); }}
               className={`px-4 py-2 rounded-full text-sm font-bold transition-colors ${
                 active
                   ? 'bg-primary text-on-primary'
@@ -69,14 +74,14 @@ export default function AdminCourseTable({ courses }: Props) {
                 </tr>
               </thead>
               <tbody className="divide-y divide-outline-variant/30">
-                {filtered.length === 0 ? (
+                {paged.length === 0 ? (
                   <tr>
                     <td colSpan={6} className="px-6 py-12 text-center text-secondary">
                       該当するコースがありません
                     </td>
                   </tr>
                 ) : (
-                  filtered.map((course) => (
+                  paged.map((course) => (
                     <tr key={course.id} className="hover:bg-surface-container-low/50 transition-colors group">
                       <td className="px-6 py-4 whitespace-nowrap">
                         <div className="flex items-center gap-4">
@@ -115,13 +120,24 @@ export default function AdminCourseTable({ courses }: Props) {
           </div>
           <div className="px-6 py-4 border-t border-outline-variant/30 flex items-center justify-between">
             <div className="text-sm text-secondary">
-              全 {courses.length} 件中 {filtered.length} 件を表示
+              全 {filtered.length} 件中 {page * perPage + 1} - {Math.min((page + 1) * perPage, filtered.length)} 件を表示
             </div>
             <div className="flex items-center gap-2">
-              <button disabled className="p-2 rounded-full border border-outline-variant/30 text-secondary transition-colors disabled:opacity-50" aria-label="前のページ">
+              <button
+                onClick={() => setPage(p => p - 1)}
+                disabled={page === 0}
+                className="p-2 rounded-full border border-outline-variant/30 text-secondary hover:text-on-surface transition-colors disabled:opacity-50"
+                aria-label="前のページ"
+              >
                 <ChevronLeft size={16} />
               </button>
-              <button disabled className="p-2 rounded-full border border-outline-variant/30 text-secondary transition-colors disabled:opacity-50" aria-label="次のページ">
+              <span className="text-xs text-secondary font-medium">{page + 1} / {totalPages || 1}</span>
+              <button
+                onClick={() => setPage(p => p + 1)}
+                disabled={page >= totalPages - 1}
+                className="p-2 rounded-full border border-outline-variant/30 text-secondary hover:text-on-surface transition-colors disabled:opacity-50"
+                aria-label="次のページ"
+              >
                 <ChevronRight size={16} />
               </button>
             </div>

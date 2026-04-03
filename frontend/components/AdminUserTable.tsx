@@ -15,6 +15,8 @@ export default function AdminUserTable({ students }: AdminUserTableProps) {
   const router = useRouter();
   const [searchTerm, setSearchTerm] = useState('');
   const [deletingId, setDeletingId] = useState<string | null>(null);
+  const [page, setPage] = useState(0);
+  const perPage = 10;
 
   const filteredStudents = useMemo(() => {
     const lower = searchTerm.toLowerCase();
@@ -62,7 +64,7 @@ export default function AdminUserTable({ students }: AdminUserTableProps) {
                 type="text"
                 placeholder="名前やメールアドレスで検索..."
                 value={searchTerm}
-                onChange={(e) => setSearchTerm(e.target.value)}
+                onChange={(e) => { setSearchTerm(e.target.value); setPage(0); }}
                 className="bg-transparent border-none focus:ring-0 text-sm w-full placeholder:text-secondary/50 ml-2 md:ml-3 outline-none"
               />
             </div>
@@ -85,7 +87,7 @@ export default function AdminUserTable({ students }: AdminUserTableProps) {
                 </tr>
               </thead>
               <tbody className="divide-y divide-outline-variant/30">
-                {filteredStudents.map((student) => (
+                {filteredStudents.slice(page * perPage, (page + 1) * perPage).map((student) => (
                   <tr key={student.id} className="hover:bg-surface-container-low/50 transition-colors group">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center gap-3">
@@ -136,19 +138,35 @@ export default function AdminUserTable({ students }: AdminUserTableProps) {
               </tbody>
             </table>
           </div>
-          <div className="px-6 py-4 border-t border-outline-variant/30 flex items-center justify-between">
-            <div className="text-sm text-secondary">
-              全 {filteredStudents.length} 件中 1 - {filteredStudents.length} 件を表示
+          {(() => {
+            const totalPages = Math.ceil(filteredStudents.length / perPage);
+            return (
+            <div className="px-6 py-4 border-t border-outline-variant/30 flex items-center justify-between">
+              <div className="text-sm text-secondary">
+                全 {filteredStudents.length} 件中 {page * perPage + 1} - {Math.min((page + 1) * perPage, filteredStudents.length)} 件を表示
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setPage(p => p - 1)}
+                  disabled={page === 0}
+                  className="p-2 rounded-full border border-outline-variant/30 text-secondary hover:text-on-surface transition-colors disabled:opacity-50"
+                  aria-label="前のページ"
+                >
+                  <ChevronLeft size={16} />
+                </button>
+                <span className="text-xs text-secondary font-medium">{page + 1} / {totalPages || 1}</span>
+                <button
+                  onClick={() => setPage(p => p + 1)}
+                  disabled={page >= totalPages - 1}
+                  className="p-2 rounded-full border border-outline-variant/30 text-secondary hover:text-on-surface transition-colors disabled:opacity-50"
+                  aria-label="次のページ"
+                >
+                  <ChevronRight size={16} />
+                </button>
+              </div>
             </div>
-            <div className="flex items-center gap-2">
-              <button disabled className="p-2 rounded-full border border-outline-variant/30 text-secondary transition-colors disabled:opacity-50" aria-label="前のページ">
-                <ChevronLeft size={16} />
-              </button>
-              <button disabled className="p-2 rounded-full border border-outline-variant/30 text-secondary transition-colors disabled:opacity-50" aria-label="次のページ">
-                <ChevronRight size={16} />
-              </button>
-            </div>
-          </div>
+            );
+          })()}
         </div>
       </div>
     </div>

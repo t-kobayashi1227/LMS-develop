@@ -93,23 +93,23 @@ class LessonController extends Controller
             ->with(['chapter.course', 'resources', 'quizQuestions'])
             ->firstOrFail();
 
-        // Load assignment + submission only for assignment-type lessons
+        $user = $request->user();
+
+        // Load assignment + user's submission in a single eager load
         if ($lesson->type === 'assignment') {
-            $lesson->load(['assignment']);
+            $lesson->load([
+                'assignment.submissions' => fn ($q) => $q->where('user_id', $user->id),
+            ]);
+            if ($lesson->assignment) {
+                $lesson->submission_data = $lesson->assignment->submissions->first();
+            }
         }
 
-        $user = $request->user();
         $enrollment = $this->resolveEnrollment($user, $lesson->chapter->course_id);
 
         $completedLessonIds = $this->getCompletedLessonIds($enrollment);
         $lesson->is_completed = in_array($lesson->id, $completedLessonIds);
         $lesson->is_locked = $this->isLocked($lesson, $completedLessonIds, $enrollment);
-
-        if ($lesson->type === 'assignment' && $lesson->assignment) {
-            $lesson->submission_data = $lesson->assignment->submissions()
-                ->where('user_id', $user->id)
-                ->first();
-        }
 
         return new LessonDetailResource($lesson);
     }
