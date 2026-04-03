@@ -26,6 +26,10 @@ export default function AdminUserTable({ students }: AdminUserTableProps) {
     );
   }, [searchTerm, students]);
 
+  const totalPages = Math.ceil(filteredStudents.length / perPage);
+  const clampedPage = Math.min(page, Math.max(0, totalPages - 1));
+  const paged = filteredStudents.slice(clampedPage * perPage, (clampedPage + 1) * perPage);
+
   const handleDelete = useCallback(async (studentId: string, studentName: string) => {
     if (!confirm(`${studentName} を削除しますか？`)) return;
     setDeletingId(studentId);
@@ -87,7 +91,7 @@ export default function AdminUserTable({ students }: AdminUserTableProps) {
                 </tr>
               </thead>
               <tbody className="divide-y divide-outline-variant/30">
-                {filteredStudents.slice(page * perPage, (page + 1) * perPage).map((student) => (
+                {paged.map((student) => (
                   <tr key={student.id} className="hover:bg-surface-container-low/50 transition-colors group">
                     <td className="px-6 py-4 whitespace-nowrap">
                       <div className="flex items-center gap-3">
@@ -138,35 +142,30 @@ export default function AdminUserTable({ students }: AdminUserTableProps) {
               </tbody>
             </table>
           </div>
-          {(() => {
-            const totalPages = Math.ceil(filteredStudents.length / perPage);
-            return (
-            <div className="px-6 py-4 border-t border-outline-variant/30 flex items-center justify-between">
-              <div className="text-sm text-secondary">
-                全 {filteredStudents.length} 件中 {page * perPage + 1} - {Math.min((page + 1) * perPage, filteredStudents.length)} 件を表示
-              </div>
-              <div className="flex items-center gap-2">
-                <button
-                  onClick={() => setPage(p => p - 1)}
-                  disabled={page === 0}
-                  className="p-2 rounded-full border border-outline-variant/30 text-secondary hover:text-on-surface transition-colors disabled:opacity-50"
-                  aria-label="前のページ"
-                >
-                  <ChevronLeft size={16} />
-                </button>
-                <span className="text-xs text-secondary font-medium">{page + 1} / {totalPages || 1}</span>
-                <button
-                  onClick={() => setPage(p => p + 1)}
-                  disabled={page >= totalPages - 1}
-                  className="p-2 rounded-full border border-outline-variant/30 text-secondary hover:text-on-surface transition-colors disabled:opacity-50"
-                  aria-label="次のページ"
-                >
-                  <ChevronRight size={16} />
-                </button>
-              </div>
+          <div className="px-6 py-4 border-t border-outline-variant/30 flex items-center justify-between">
+            <div className="text-sm text-secondary">
+              {filteredStudents.length === 0 ? '該当する受講者がいません' : `全 ${filteredStudents.length} 件中 ${clampedPage * perPage + 1} - ${Math.min((clampedPage + 1) * perPage, filteredStudents.length)} 件を表示`}
             </div>
-            );
-          })()}
+            <div className="flex items-center gap-2">
+              <button
+                onClick={() => setPage(p => p - 1)}
+                disabled={clampedPage === 0}
+                className="p-2 rounded-full border border-outline-variant/30 text-secondary hover:text-on-surface transition-colors disabled:opacity-50"
+                aria-label="前のページ"
+              >
+                <ChevronLeft size={16} />
+              </button>
+              <span className="text-xs text-secondary font-medium">{clampedPage + 1} / {totalPages || 1}</span>
+              <button
+                onClick={() => setPage(p => p + 1)}
+                disabled={clampedPage >= totalPages - 1}
+                className="p-2 rounded-full border border-outline-variant/30 text-secondary hover:text-on-surface transition-colors disabled:opacity-50"
+                aria-label="次のページ"
+              >
+                <ChevronRight size={16} />
+              </button>
+            </div>
+          </div>
         </div>
       </div>
     </div>

@@ -34,7 +34,8 @@ export default function AdminCourseTable({ courses }: Props) {
     : courses.filter((c) => c.status === filter);
 
   const totalPages = Math.ceil(filtered.length / perPage);
-  const paged = filtered.slice(page * perPage, (page + 1) * perPage);
+  const clampedPage = Math.min(page, Math.max(0, totalPages - 1));
+  const paged = filtered.slice(clampedPage * perPage, (clampedPage + 1) * perPage);
 
   return (
     <>
@@ -120,21 +121,21 @@ export default function AdminCourseTable({ courses }: Props) {
           </div>
           <div className="px-6 py-4 border-t border-outline-variant/30 flex items-center justify-between">
             <div className="text-sm text-secondary">
-              全 {filtered.length} 件中 {page * perPage + 1} - {Math.min((page + 1) * perPage, filtered.length)} 件を表示
+              {filtered.length === 0 ? '該当するコースがありません' : `全 ${filtered.length} 件中 ${clampedPage * perPage + 1} - ${Math.min((clampedPage + 1) * perPage, filtered.length)} 件を表示`}
             </div>
             <div className="flex items-center gap-2">
               <button
                 onClick={() => setPage(p => p - 1)}
-                disabled={page === 0}
+                disabled={clampedPage === 0}
                 className="p-2 rounded-full border border-outline-variant/30 text-secondary hover:text-on-surface transition-colors disabled:opacity-50"
                 aria-label="前のページ"
               >
                 <ChevronLeft size={16} />
               </button>
-              <span className="text-xs text-secondary font-medium">{page + 1} / {totalPages || 1}</span>
+              <span className="text-xs text-secondary font-medium">{clampedPage + 1} / {totalPages || 1}</span>
               <button
                 onClick={() => setPage(p => p + 1)}
-                disabled={page >= totalPages - 1}
+                disabled={clampedPage >= totalPages - 1}
                 className="p-2 rounded-full border border-outline-variant/30 text-secondary hover:text-on-surface transition-colors disabled:opacity-50"
                 aria-label="次のページ"
               >
