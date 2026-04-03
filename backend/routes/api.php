@@ -74,6 +74,10 @@ Route::prefix('v1')->group(function () {
             Route::post('/admin/lessons/{lessonUuid}/quiz', [AdminCourseController::class, 'storeQuiz']);
             Route::put('/admin/quiz/{uuid}', [AdminCourseController::class, 'updateQuiz']);
             Route::delete('/admin/quiz/{uuid}', [AdminCourseController::class, 'destroyQuiz']);
+
+            // Lesson Resource CRUD
+            Route::post('/admin/lessons/{lessonUuid}/resources', [AdminCourseController::class, 'storeResource']);
+            Route::delete('/admin/resources/{uuid}', [AdminCourseController::class, 'destroyResource']);
         });
     });
 });

@@ -175,6 +175,24 @@ export interface KpiData {
   totalHours: number;
 }
 
+export interface SubmissionDetail {
+  id: string;
+  content: string | null;
+  fileName: string | null;
+  fileUrl: string | null;
+  status: 'submitted' | 'graded';
+  score: number | null;
+  feedback: string | null;
+  submittedAt: string | null;
+  gradedAt: string | null;
+  assignmentTitle: string;
+  assignmentDescription: string | null;
+  maxScore: number | null;
+  courseName: string;
+  studentName: string;
+  studentEmail: string;
+}
+
 export interface PendingSubmission {
   id: string;
   assignmentTitle: string;

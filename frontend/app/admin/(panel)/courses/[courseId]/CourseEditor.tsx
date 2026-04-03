@@ -3,7 +3,7 @@
 import { useState, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowLeft, Save, Plus, Trash2, ChevronDown, ChevronUp, GripVertical, Video, FileText, ClipboardList, HelpCircle, ImageIcon } from 'lucide-react';
+import { ArrowLeft, Save, Plus, Trash2, ChevronDown, ChevronUp, GripVertical, Video, FileText, ClipboardList, HelpCircle, ImageIcon, Upload, Paperclip } from 'lucide-react';
 
 interface QuizQuestion {
   id: string;
@@ -13,6 +13,14 @@ interface QuizQuestion {
   correctOptionIndex: number | null;
   conditions: string[] | null;
   explanation: string | null;
+}
+
+interface ResourceData {
+  id: string;
+  title: string;
+  fileOriginalName: string;
+  fileSizeBytes: number | null;
+  mimeType: string | null;
 }
 
 interface LessonData {
@@ -25,6 +33,7 @@ interface LessonData {
   durationSeconds: number | null;
   sortOrder: number;
   quizQuestions: QuizQuestion[];
+  resources: ResourceData[];
 }
 
 interface ChapterData {
@@ -181,6 +190,7 @@ export default function CourseEditor({ course: initial }: Props) {
           durationSeconds: null,
           sortOrder: ch.lessons.length,
           quizQuestions: [],
+          resources: [],
         }],
       } : ch),
     }));
@@ -255,6 +265,42 @@ export default function CourseEditor({ course: initial }: Props) {
         lessons: ch.lessons.map(l => ({
           ...l,
           quizQuestions: l.quizQuestions.filter(q => q.id !== quizId),
+        })),
+      })),
+    }));
+  };
+
+  const uploadResource = async (lessonId: string, file: File) => {
+    const formData = new FormData();
+    formData.append('file', file);
+    const res = await fetch(`/api/admin/lessons/${lessonId}/resources`, {
+      method: 'POST',
+      body: formData,
+    });
+    if (!res.ok) return;
+    const data = await res.json();
+    const newResource: ResourceData = data.data;
+    setCourse(prev => ({
+      ...prev,
+      chapters: prev.chapters.map(ch => ({
+        ...ch,
+        lessons: ch.lessons.map(l => l.id === lessonId ? {
+          ...l,
+          resources: [...l.resources, newResource],
+        } : l),
+      })),
+    }));
+  };
+
+  const deleteResource = async (resourceId: string) => {
+    await apiCall(`resources/${resourceId}`, 'DELETE');
+    setCourse(prev => ({
+      ...prev,
+      chapters: prev.chapters.map(ch => ({
+        ...ch,
+        lessons: ch.lessons.map(l => ({
+          ...l,
+          resources: l.resources.filter(r => r.id !== resourceId),
         })),
       })),
     }));
@@ -648,6 +694,45 @@ export default function CourseEditor({ course: initial }: Props) {
                             </div>
                             );
                           })}
+                        </div>
+
+                        <div>
+                          <div className="flex items-center justify-between mb-2">
+                            <label className="text-xs font-bold text-secondary uppercase tracking-widest flex items-center gap-1.5">
+                              <Paperclip size={12} /> 添付資料 ({lesson.resources.length})
+                            </label>
+                            <label className="text-xs text-primary font-bold hover:underline flex items-center gap-1 cursor-pointer">
+                              <Upload size={12} /> ファイルを追加
+                              <input
+                                type="file"
+                                className="hidden"
+                                onChange={e => {
+                                  const file = e.target.files?.[0];
+                                  if (file) uploadResource(lesson.id, file);
+                                  e.target.value = '';
+                                }}
+                              />
+                            </label>
+                          </div>
+                          {lesson.resources.map((r) => (
+                            <div key={r.id} className="flex items-center gap-2 bg-white p-2.5 rounded-lg border border-outline-variant/20 mb-1.5">
+                              <FileText size={14} className="text-tertiary shrink-0" />
+                              <div className="flex-1 min-w-0">
+                                <p className="text-sm text-on-surface truncate">{r.title}</p>
+                                <p className="text-[10px] text-secondary">
+                                  {r.fileOriginalName}
+                                  {r.fileSizeBytes ? ` • ${(r.fileSizeBytes / 1024).toFixed(0)} KB` : ''}
+                                </p>
+                              </div>
+                              <button
+                                onClick={() => deleteResource(r.id)}
+                                className="p-1 text-slate-400 hover:text-red-500 shrink-0"
+                                aria-label="資料を削除"
+                              >
+                                <Trash2 size={12} />
+                              </button>
+                            </div>
+                          ))}
                         </div>
                       </div>
                     )}

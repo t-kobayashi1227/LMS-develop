@@ -231,12 +231,8 @@ export default function LessonView({ courseData, initialLessonId, initialLessonD
               <AssignmentSection
                 assignment={lessonDetail.assignment}
                 submission={lessonDetail.submission ?? null}
-                onSubmitted={() => {
-                  // Reload lesson detail
-                  fetch(`/api/lessons/${activeLessonId}`)
-                    .then(r => r.json())
-                    .then(data => setLessonDetail(data.data))
-                    .catch(() => {});
+                onSubmitted={(sub) => {
+                  setLessonDetail(prev => prev ? { ...prev, submission: sub } : prev);
                 }}
               />
             )}
@@ -328,7 +324,7 @@ function AssignmentSection({
 }: {
   assignment: NonNullable<LessonDetail['assignment']>;
   submission: LessonDetail['submission'] | null;
-  onSubmitted: () => void;
+  onSubmitted: (sub: NonNullable<LessonDetail['submission']>) => void;
 }) {
   const [content, setContent] = useState('');
   const [file, setFile] = useState<File | null>(null);
@@ -353,10 +349,21 @@ function AssignmentSection({
         body: formData,
       });
       if (!res.ok) {
-        setError('提出に失敗しました');
+        const err = await res.json().catch(() => ({}));
+        setError(err.message || '提出に失敗しました');
         return;
       }
-      onSubmitted();
+      const data = await res.json();
+      onSubmitted({
+        id: data.data.id,
+        content: content || null,
+        fileName: file?.name ?? null,
+        status: 'submitted',
+        score: null,
+        feedback: null,
+        submittedAt: new Date().toISOString(),
+        gradedAt: null,
+      });
     } catch {
       setError('サーバーに接続できません');
     } finally {

@@ -3,24 +3,7 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { ArrowLeft, Save, CheckCircle, FileText, Download } from 'lucide-react';
-
-interface SubmissionDetail {
-  id: string;
-  content: string | null;
-  fileName: string | null;
-  fileUrl: string | null;
-  status: 'submitted' | 'graded';
-  score: number | null;
-  feedback: string | null;
-  submittedAt: string | null;
-  gradedAt: string | null;
-  assignmentTitle: string;
-  assignmentDescription: string | null;
-  maxScore: number | null;
-  courseName: string;
-  studentName: string;
-  studentEmail: string;
-}
+import type { SubmissionDetail } from '@/lib/types';
 
 interface Props {
   submission: SubmissionDetail;

@@ -33,7 +33,7 @@ class LessonDetailResource extends JsonResource
                 'fileOriginalName' => $r->file_original_name,
                 'fileSizeBytes' => $r->file_size_bytes,
                 'mimeType' => $r->mime_type,
-                'url' => $r->file_path,
+                'url' => $r->file_path ? asset('storage/' . $r->file_path) : null,
             ]),
             'quizQuestions' => $locked ? [] : QuizQuestionResource::collection($this->quizQuestions),
             'assignment' => $locked ? null : $this->whenLoaded('assignment', function () {

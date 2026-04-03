@@ -10,6 +10,7 @@ use App\Models\Course;
 use App\Models\CourseCategory;
 use App\Models\Enrollment;
 use App\Models\Lesson;
+use App\Models\LessonResource;
 use App\Models\QuizQuestion;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
@@ -62,7 +63,7 @@ class AdminCourseController extends Controller
     public function show(string $uuid): JsonResponse
     {
         $course = Course::where('uuid', $uuid)
-            ->with(['category', 'chapters.lessons.quizQuestions'])
+            ->with(['category', 'chapters.lessons.quizQuestions', 'chapters.lessons.resources'])
             ->withCount(['enrollments', 'lessons'])
             ->firstOrFail();
 
@@ -98,6 +99,13 @@ class AdminCourseController extends Controller
                             'correctOptionIndex' => $q->correct_option_index,
                             'conditions' => $q->conditions,
                             'explanation' => $q->explanation,
+                        ]),
+                        'resources' => $l->resources->sortBy('sort_order')->values()->map(fn ($r) => [
+                            'id' => $r->uuid,
+                            'title' => $r->title,
+                            'fileOriginalName' => $r->file_original_name,
+                            'fileSizeBytes' => $r->file_size_bytes,
+                            'mimeType' => $r->mime_type,
                         ]),
                     ]),
                 ]),
@@ -369,6 +377,56 @@ class AdminCourseController extends Controller
     {
         $question = QuizQuestion::where('uuid', $quizUuid)->firstOrFail();
         $question->delete();
+
+        return response()->json(['data' => ['status' => 'deleted']]);
+    }
+
+    // ── レッスン資料 ──────────────────────────────────
+
+    public function storeResource(Request $request, string $lessonUuid): JsonResponse
+    {
+        $lesson = Lesson::where('uuid', $lessonUuid)->firstOrFail();
+
+        $request->validate([
+            'file' => 'required|file|max:20480',
+            'title' => 'nullable|string|max:255',
+        ]);
+
+        $file = $request->file('file');
+        $path = $file->store('lesson-resources', 'public');
+
+        $maxOrder = $lesson->resources()->max('sort_order') ?? -1;
+        $resource = LessonResource::create([
+            'lesson_id' => $lesson->id,
+            'title' => $request->input('title') ?? $file->getClientOriginalName(),
+            'file_path' => $path,
+            'file_original_name' => $file->getClientOriginalName(),
+            'file_size_bytes' => $file->getSize(),
+            'mime_type' => $file->getMimeType(),
+            'sort_order' => $maxOrder + 1,
+        ]);
+
+        return response()->json([
+            'data' => [
+                'id' => $resource->uuid,
+                'title' => $resource->title,
+                'fileOriginalName' => $resource->file_original_name,
+                'fileSizeBytes' => $resource->file_size_bytes,
+                'mimeType' => $resource->mime_type,
+                'url' => asset('storage/' . $resource->file_path),
+            ],
+        ], 201);
+    }
+
+    public function destroyResource(string $resourceUuid): JsonResponse
+    {
+        $resource = LessonResource::where('uuid', $resourceUuid)->firstOrFail();
+
+        if ($resource->file_path) {
+            Storage::disk('public')->delete($resource->file_path);
+        }
+
+        $resource->delete();
 
         return response()->json(['data' => ['status' => 'deleted']]);
     }
