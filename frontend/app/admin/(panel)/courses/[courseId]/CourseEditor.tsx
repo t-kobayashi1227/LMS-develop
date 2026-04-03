@@ -493,11 +493,15 @@ export default function CourseEditor({ course: initial }: Props) {
                         <div>
                           <label className="block text-xs font-bold text-secondary uppercase tracking-widest mb-1.5">動画URL</label>
                           <input
-                            type="text"
+                            type="url"
                             value={lesson.videoUrl ?? ''}
                             onChange={e => updateLessonLocal(lesson.id, { videoUrl: e.target.value || null, hasVideo: !!e.target.value })}
-                            onBlur={() => saveLesson(lesson.id, { videoUrl: lesson.videoUrl, hasVideo: !!lesson.videoUrl })}
-                            className="w-full px-3 py-2 bg-white border border-outline-variant/30 rounded-lg text-sm outline-none"
+                            onBlur={() => {
+                              const url = lesson.videoUrl;
+                              if (url && !/^https?:\/\/.+/.test(url)) return;
+                              saveLesson(lesson.id, { videoUrl: url, hasVideo: !!url });
+                            }}
+                            className="w-full px-3 py-2 bg-white border border-outline-variant/30 rounded-lg text-sm outline-none invalid:border-red-300 invalid:text-red-500"
                             placeholder="https://example.com/video.mp4"
                           />
                         </div>

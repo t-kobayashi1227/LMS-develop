@@ -268,7 +268,7 @@ class AdminCourseController extends Controller
             'title' => 'required|string|max:500',
             'type' => 'required|in:video,text,assignment',
             'hasVideo' => 'boolean',
-            'videoUrl' => 'nullable|string|max:1000',
+            'videoUrl' => 'nullable|url|max:1000',
             'contentBody' => 'nullable|string',
             'durationSeconds' => 'nullable|integer|min:0',
         ]);
@@ -295,7 +295,7 @@ class AdminCourseController extends Controller
             'title' => 'sometimes|string|max:500',
             'type' => 'sometimes|in:video,text,assignment',
             'hasVideo' => 'sometimes|boolean',
-            'videoUrl' => 'nullable|string|max:1000',
+            'videoUrl' => 'nullable|url|max:1000',
             'contentBody' => 'nullable|string',
             'durationSeconds' => 'nullable|integer|min:0',
             'sortOrder' => 'sometimes|integer|min:0',
