@@ -18,6 +18,7 @@ export async function POST() {
 
   const cookieStore = await cookies();
   cookieStore.delete('auth_token');
+  cookieStore.delete('user_role');
 
   return NextResponse.json({ ok: true });
 }

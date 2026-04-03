@@ -21,12 +21,18 @@ export async function POST(request: Request) {
   }
 
   const cookieStore = await cookies();
-  cookieStore.set('auth_token', data.data.token, {
+  const cookieOptions = {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
+    sameSite: 'lax' as const,
     path: '/',
     maxAge: 60 * 60 * 24 * 7,
+  };
+
+  cookieStore.set('auth_token', data.data.token, cookieOptions);
+  cookieStore.set('user_role', data.data.user.role, {
+    ...cookieOptions,
+    httpOnly: false, // middleware needs to read this
   });
 
   return NextResponse.json({ user: data.data.user });

@@ -105,6 +105,7 @@ jobs:
             ${{ secrets.XSERVER_SSH_USER }}@${{ secrets.XSERVER_SSH_HOST }} \
             "cd ${{ secrets.XSERVER_DEPLOY_PATH }} && \
              /opt/php-8.3/bin/php artisan migrate --force && \
+             /opt/php-8.3/bin/php artisan storage:link 2>/dev/null || true && \
              /opt/php-8.3/bin/php artisan config:cache && \
              /opt/php-8.3/bin/php artisan route:cache && \
              /opt/php-8.3/bin/php artisan view:cache"
