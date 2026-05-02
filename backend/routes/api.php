@@ -3,6 +3,7 @@
 use App\Http\Controllers\Api\V1\AnalyticsController;
 use App\Http\Controllers\Api\V1\AssignmentController;
 use App\Http\Controllers\Api\V1\AuthController;
+use App\Http\Controllers\Api\V1\AdminCategoryController;
 use App\Http\Controllers\Api\V1\AdminCourseController;
 use App\Http\Controllers\Api\V1\CourseController;
 use App\Http\Controllers\Api\V1\LessonController;
@@ -46,8 +47,13 @@ Route::prefix('v1')->group(function () {
             Route::get('/admin/submissions/{uuid}', [AssignmentController::class, 'showSubmission']);
             Route::put('/admin/submissions/{uuid}/grade', [AssignmentController::class, 'grade']);
 
-            // Course CRUD
+            // Category CRUD
             Route::get('/admin/categories', [AdminCourseController::class, 'categoriesWithId']);
+            Route::post('/admin/categories', [AdminCategoryController::class, 'store']);
+            Route::put('/admin/categories/{id}', [AdminCategoryController::class, 'update']);
+            Route::delete('/admin/categories/{id}', [AdminCategoryController::class, 'destroy']);
+
+            // Course CRUD
             Route::get('/admin/courses', [AdminCourseController::class, 'index']);
             Route::post('/admin/courses', [AdminCourseController::class, 'store']);
             Route::get('/admin/courses/{uuid}', [AdminCourseController::class, 'show']);
