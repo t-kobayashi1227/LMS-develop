@@ -1,6 +1,7 @@
 import type { Metadata } from 'next';
 import { getCurrentUser } from '@/lib/api';
 import SettingsForm from '@/components/SettingsForm';
+import CategoryManager from '@/components/CategoryManager';
 
 export const metadata: Metadata = {
   title: '設定 | 管理者 | Niigata AI Academy',
@@ -21,6 +22,7 @@ export default async function AdminSettings() {
       </div>
       <div className="px-4 md:px-8 max-w-3xl mx-auto space-y-6">
         <SettingsForm user={user} roleLabel="管理者" />
+        <CategoryManager />
       </div>
     </div>
   );
