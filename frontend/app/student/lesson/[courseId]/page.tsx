@@ -10,12 +10,12 @@ export const metadata: Metadata = {
 
 interface Props {
   params: Promise<{ courseId: string }>;
-  searchParams: Promise<{ preview?: string }>;
+  searchParams: Promise<{ preview?: string; from?: string }>;
 }
 
 export default async function LessonPage({ params, searchParams }: Props) {
   const { courseId } = await params;
-  const { preview } = await searchParams;
+  const { preview, from } = await searchParams;
 
   let user;
   try {
@@ -25,7 +25,9 @@ export default async function LessonPage({ params, searchParams }: Props) {
   }
 
   const isPreview = preview === 'true' && user.role === 'admin';
-  const backHref = user.role === 'admin' ? '/admin/courses' : '/student/dashboard';
+  const backHref = user.role === 'admin'
+    ? (from === 'editor' ? `/admin/courses/${courseId}` : '/admin/courses')
+    : '/student/dashboard';
 
   let courseData;
   try {

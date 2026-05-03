@@ -3,7 +3,7 @@
 import { useState, useCallback, useRef } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
-import { ArrowLeft, Save, Plus, Trash2, ChevronDown, ChevronUp, GripVertical, Video, FileText, ClipboardList, HelpCircle, ImageIcon, Upload, Paperclip } from 'lucide-react';
+import { ArrowLeft, Save, Plus, Trash2, ChevronDown, ChevronUp, GripVertical, Video, FileText, ClipboardList, HelpCircle, ImageIcon, Upload, Paperclip, Eye } from 'lucide-react';
 
 interface QuizQuestion {
   id: string;
@@ -337,6 +337,13 @@ export default function CourseEditor({ course: initial }: Props) {
           />
           <div className="flex items-center gap-3 shrink-0">
             {message && <span className={`text-sm font-medium ${message.includes('失敗') ? 'text-red-500' : 'text-green-600'}`}>{message}</span>}
+            <Link
+              href={`/student/lesson/${course.id}?preview=true&from=editor`}
+              className="flex items-center gap-2 px-6 py-2.5 border border-outline-variant/50 text-secondary rounded-full text-sm font-bold hover:border-primary hover:text-primary transition-colors"
+            >
+              <Eye size={16} />
+              プレビュー
+            </Link>
             <select
               value={course.status}
               onChange={e => setCourse(prev => ({ ...prev, status: e.target.value }))}
